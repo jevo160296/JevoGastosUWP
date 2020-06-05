@@ -1,18 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
+﻿using JevoGastosCore;
+using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 namespace JevoGastosUWP
@@ -40,6 +31,7 @@ namespace JevoGastosUWP
         protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
             Frame rootFrame = Window.Current.Content as Frame;
+            GastosContainer gastosContainer = new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
 
             // No repetir la inicialización de la aplicación si la ventana tiene contenido todavía,
             // solo asegurarse de que la ventana está activa.
@@ -66,7 +58,7 @@ namespace JevoGastosUWP
                     // Cuando no se restaura la pila de navegación, navegar a la primera página,
                     // configurando la nueva página pasándole la información requerida como
                     //parámetro de navegación
-                    rootFrame.Navigate(typeof(MainPage), e.Arguments);
+                    rootFrame.Navigate(typeof(MainPage), gastosContainer);
                 }
                 // Asegurarse de que la ventana actual está activa.
                 Window.Current.Activate();
