@@ -1,0 +1,36 @@
+﻿<UserControl
+    x:Class="JevoGastosUWP.ControlesPersonalizados.AddEtiquetaForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JevoGastosUWP.ControlesPersonalizados"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch"
+    >
+
+    <StackPanel>
+        <Border 
+            Background="{x:Bind HeaderBackground,Mode=OneWay}" 
+            Padding="8">
+            <TextBlock 
+                Text="{x:Bind HeaderText}" 
+                Foreground="{x:Bind HeaderForeground,Mode=OneWay}"
+                TextAlignment="Center"/>
+        </Border>
+        <TextBox 
+            x:Name="TB_Name" 
+            Header="Nombre" 
+            Margin="8"/>
+        <Button 
+            x:Name="B_Save" 
+            Margin="8" 
+            Click="B_Save_Click">
+            <StackPanel Orientation="Horizontal">
+                <SymbolIcon Symbol="Save"/>
+                <TextBlock Text="Guardar"/>
+            </StackPanel>
+        </Button>
+    </StackPanel>
+</UserControl>

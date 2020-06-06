@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
+# Blend for Visual Studio Version 16
 VisualStudioVersion = 16.0.29806.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "JevoGastosUWP", "JevoGastosUWP.csproj", "{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}"
@@ -14,6 +14,11 @@ Global
 		Debug|ARM64 = Debug|ARM64
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
+		DebugSee|Any CPU = DebugSee|Any CPU
+		DebugSee|ARM = DebugSee|ARM
+		DebugSee|ARM64 = DebugSee|ARM64
+		DebugSee|x64 = DebugSee|x64
+		DebugSee|x86 = DebugSee|x86
 		Release|Any CPU = Release|Any CPU
 		Release|ARM = Release|ARM
 		Release|ARM64 = Release|ARM64
@@ -34,6 +39,21 @@ Global
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Debug|x86.ActiveCfg = Debug|x86
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Debug|x86.Build.0 = Debug|x86
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Debug|x86.Deploy.0 = Debug|x86
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|Any CPU.ActiveCfg = Release|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|Any CPU.Build.0 = Release|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|Any CPU.Deploy.0 = Release|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM.ActiveCfg = Debug|ARM
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM.Build.0 = Debug|ARM
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM.Deploy.0 = Debug|ARM
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM64.ActiveCfg = Debug|ARM64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM64.Build.0 = Debug|ARM64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|ARM64.Deploy.0 = Debug|ARM64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x64.ActiveCfg = Debug|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x64.Build.0 = Debug|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x64.Deploy.0 = Debug|x64
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x86.ActiveCfg = Debug|x86
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x86.Build.0 = Debug|x86
+		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.DebugSee|x86.Deploy.0 = Debug|x86
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Release|Any CPU.ActiveCfg = Release|x86
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Release|ARM.ActiveCfg = Release|ARM
 		{E8BE53EF-B1E6-4A9E-A67D-C57F4B9709A8}.Release|ARM.Build.0 = Release|ARM
@@ -57,6 +77,16 @@ Global
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Debug|x64.Build.0 = Debug|Any CPU
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Debug|x86.ActiveCfg = Debug|Any CPU
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Debug|x86.Build.0 = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|Any CPU.ActiveCfg = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|Any CPU.Build.0 = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|ARM.ActiveCfg = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|ARM.Build.0 = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|ARM64.ActiveCfg = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|ARM64.Build.0 = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|x64.ActiveCfg = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|x64.Build.0 = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|x86.ActiveCfg = Debug|Any CPU
+		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.DebugSee|x86.Build.0 = Debug|Any CPU
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0704360E-76AB-467F-8D05-7E74C8A6B7BC}.Release|ARM.ActiveCfg = Release|Any CPU
