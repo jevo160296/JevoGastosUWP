@@ -7,10 +7,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     HorizontalAlignment="Stretch"
-    VerticalAlignment="Stretch"
+    VerticalAlignment="Stretch" d:DesignWidth="423.01"
+    
     >
 
-    <StackPanel>
+    <StackPanel x:Name="SP_Main">
         <Border 
             Background="{x:Bind HeaderBackground,Mode=OneWay}" 
             Padding="8">
@@ -21,16 +22,20 @@
         </Border>
         <TextBox 
             x:Name="TB_Name" 
-            Header="Nombre" 
+            Header="{x:Bind Header,Mode=OneWay}" 
             Margin="8"/>
-        <Button 
-            x:Name="B_Save" 
-            Margin="8" 
-            Click="B_Save_Click">
-            <StackPanel Orientation="Horizontal">
-                <SymbolIcon Symbol="Save"/>
-                <TextBlock Text="Guardar"/>
-            </StackPanel>
-        </Button>
+        <TextBlock Margin="8 0 8 8" Text="{x:Bind ErrorText,Mode=OneWay}" Visibility="{x:Bind IsErrorRaised,Mode=OneWay}" Foreground="Red"/>
+        <CommandBar DefaultLabelPosition="Right">
+            <AppBarButton 
+                x:Name="B_Save"
+                Click="B_Save_Click"
+                Label="{x:Bind Label}"
+                Icon="Save"
+                >
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SP_Main}"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+        </CommandBar>
     </StackPanel>
 </UserControl>

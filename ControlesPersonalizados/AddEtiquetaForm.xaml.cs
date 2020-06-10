@@ -20,6 +20,7 @@ namespace JevoGastosUWP.ControlesPersonalizados
 {
     public sealed partial class AddEtiquetaForm : UserControl
     {
+        #region DependencyProperties
         public static readonly DependencyProperty TipoEtiquetaProperty =
             DependencyProperty.Register(
                 "TipoEtiqueta",
@@ -37,7 +38,7 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 "HeaderBackground",
                 typeof(Brush),
                 typeof(UserControl),
-                new PropertyMetadata(new SolidColorBrush(Windows.UI.Color.FromArgb(1,1,1,1)))
+                new PropertyMetadata(new SolidColorBrush(Windows.UI.Color.FromArgb(1, 1, 1, 1)))
                 );
         public static readonly DependencyProperty HeaderForegroundProperty =
             DependencyProperty.Register(
@@ -53,6 +54,35 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 typeof(UserControl),
                 new PropertyMetadata("Nueva etiqueta")
                 );
+        public static readonly DependencyProperty LabelProperty =
+            DependencyProperty.Register(
+                "Label",
+                typeof(string),
+                typeof(UserControl),
+                new PropertyMetadata("Guardar")
+                );
+        public static readonly DependencyProperty ErrorTextProperty =
+            DependencyProperty.Register(
+                "ErrorText",
+                typeof(string),
+                typeof(UserControl),
+                new PropertyMetadata("Error")
+                );
+        public static readonly DependencyProperty HeaderProperty =
+            DependencyProperty.Register(
+                "Header",
+                typeof(string),
+                typeof(UserControl),
+                new PropertyMetadata("Nombre")
+                );
+        public static readonly DependencyProperty IsErrorRaisedProperty =
+            DependencyProperty.Register(
+                "IsErrorRaised",
+                typeof(string),
+                typeof(UserControl),
+                new PropertyMetadata(false)
+                );
+        #endregion
 
         public TipoEtiqueta TipoEtiqueta
         {
@@ -79,9 +109,29 @@ namespace JevoGastosUWP.ControlesPersonalizados
             get => (string)GetValue(HeaderTextProperty);
             set => SetValue(HeaderTextProperty, value);
         }
+        public string Label
+        {
+            get => (string)GetValue(LabelProperty);
+            set => SetValue(LabelProperty, value);
+        }
+        public string ErrorText
+        {
+            get => (string)GetValue(ErrorTextProperty);
+            set => SetValue(ErrorTextProperty, value);
+        }
+        public string Header
+        {
+            get => (string)GetValue(HeaderProperty);
+            set => SetValue(HeaderProperty, value);
+        }
         public TextBox TextBox
         {
             get => TB_Name;
+        }
+        public bool IsErrorRaised
+        {
+            get => (bool)GetValue(IsErrorRaisedProperty);
+            set => SetValue(IsErrorRaisedProperty, value);
         }
 
         public AddEtiquetaForm()

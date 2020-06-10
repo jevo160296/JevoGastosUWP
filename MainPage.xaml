@@ -137,6 +137,7 @@
                 <Setter Property="HeaderForeground" Value="{ThemeResource Brush_Accent2Foreground}"/>
                 <Setter Property="Width" Value="{StaticResource	FlyoutThemeTouchMinWidth}"/>
                 <Setter Property="Container" Value="{x:Bind Container}"/>
+                <Setter Property="ErrorText" Value="El nombre ya existe."/>
             </Style>
         </ResourceDictionary>
 	</Page.Resources>
@@ -159,7 +160,7 @@
 					<Setter Property="Foreground" Value="{ThemeResource Brush_Accent1Foreground}"/>
 				</Style>
 			</CommandBar.Resources>
-			<AppBarButton x:Name="ABB_AddTrans" Label="Transacción" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
+			<AppBarButton x:Name="ABB_AddTrans" Label="Transacción" x:Uid="transaccion" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
 				<AppBarButton.KeyboardAccelerators>
 					<KeyboardAccelerator Key="T" Modifiers="Menu"/>
 				</AppBarButton.KeyboardAccelerators>
@@ -170,10 +171,10 @@
 					<Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}" Closing="AddTransFlyout_Closing">
                         <StackPanel Width="{StaticResource	FlyoutThemeTouchMinWidth}">
                             <Border Background="{ThemeResource Brush_Accent1Background}" Padding="8">
-                                <TextBlock Foreground="{ThemeResource Brush_Accent1Foreground}" Text="Nueva transacción" TextAlignment="Center"/>
+                                <TextBlock x:Uid="nuevatransaccion" Foreground="{ThemeResource Brush_Accent1Foreground}" Text="Nueva transacción" TextAlignment="Center"/>
                             </Border>
                             <StackPanel x:Name="SP_TransForm" Margin="8">
-                                <ComboBox x:Name="CB_Tipo" Header="Tipo" HorizontalAlignment="Stretch" SelectionChanged="CB_TipoSelected" PlaceholderText="Seleccionar tipo">
+                                <ComboBox x:Name="CB_Tipo" x:Uid="CB_tipo" Header="Tipo" HorizontalAlignment="Stretch" SelectionChanged="CB_TipoSelected" PlaceholderText="Seleccionar tipo">
                                     <x:String>Entrada</x:String>
                                     <x:String>Movimiento</x:String>
                                     <x:String>Salida</x:String>
@@ -190,26 +191,26 @@
                                 HorizontalAlignment="Stretch" 
                                 Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" />
                                 <TextBlock Text="Debe ingresar un número válido" Foreground="Red" Visibility="{x:Bind TransValorFormatError.Visibility,Mode=OneWay}"/>
-                                <TextBox x:Name="TB_Descripcion" Header="Descripción" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}"/>
+                                <TextBox x:Name="TB_Descripcion" Header="Descripción" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" PlaceholderText="Descripción"/>
                             </StackPanel>
                             <CommandBar DefaultLabelPosition="Right">
-                                <AppBarButton x:Name="APB_GuardarTrans" Label="Guardar" Icon="Save" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False"/>
-                                <AppBarButton Label="Cancelar" Icon="Cancel" Click="AppBarCancelTransButton_Click"/>
+                                <AppBarButton x:Uid="guardar" x:Name="APB_GuardarTrans" Label="Guardar" Icon="Save" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False"/>
+                                <AppBarButton x:Uid="cancelar" Label="Cancelar" Icon="Cancel" Click="AppBarCancelTransButton_Click"/>
                             </CommandBar>
-                            
-						</StackPanel>
+                        </StackPanel>
 					</Flyout>
 				</AppBarButton.Flyout>
 			</AppBarButton>
 			<AppBarSeparator Height="40"/>
-			<AppBarButton Label="Ingreso" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
+			<AppBarButton x:Uid="ingreso" Label="Ingreso" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
 				<AppBarButton.Icon>
 					<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE74B;"/>
 				</AppBarButton.Icon>
 				<AppBarButton.Flyout>
 					<Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
 						<controls:AddEtiquetaForm 
-							x:Name="AEF_Ingreso" 
+							x:Name="AEF_Ingreso"
+                            x:Uid="nuevoingreso"
 							TipoEtiqueta="Ingreso"
 							Style="{StaticResource EtiquetaFormStyle}"
 							HeaderText="Nueva fuente de ingresos"
@@ -218,7 +219,7 @@
 					</Flyout>
 				</AppBarButton.Flyout>
 			</AppBarButton>
-			<AppBarButton Label="Cuenta" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
+			<AppBarButton x:Uid="cuenta" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
 				<AppBarButton.Icon>
 					<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE779;"/>
 				</AppBarButton.Icon>
@@ -226,6 +227,7 @@
 					<Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
 						<controls:AddEtiquetaForm 
 							x:Name="AEF_Cuenta" 
+                            x:Uid="nuevacuenta"
 							TipoEtiqueta="Cuenta"
 							Style="{StaticResource EtiquetaFormStyle}"
 							HeaderText="Nueva cuenta"
@@ -234,7 +236,7 @@
 					</Flyout>
 				</AppBarButton.Flyout>
 			</AppBarButton>
-			<AppBarButton Label="Gasto" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
+			<AppBarButton x:Uid="gasto" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}">
 				<AppBarButton.Icon>
 					<FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE719;"/>
 				</AppBarButton.Icon>
@@ -242,6 +244,7 @@
 					<Flyout FlyoutPresenterStyle="{ThemeResource FlyoutFlyoutPresenterStyleNoPadding}">
 						<controls:AddEtiquetaForm 
 							x:Name="AEF_Gasto" 
+                            x:Uid="nuevogasto"
 							TipoEtiqueta="Gasto"
 							Style="{StaticResource EtiquetaFormStyle}"
 							HeaderText="Nuevo gasto"
@@ -302,7 +305,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
+				<ContentPresenter x:Uid="ingresos" ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
 				<ListView 
 					x:Name="LV_Ingresos"
 					Grid.Row="1"
@@ -317,7 +320,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
+				<ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
 				<ListView
 					x:Name="LV_Cuentas"
 					ItemsSource="{x:Bind Cuentas}"
@@ -332,7 +335,7 @@
 					<RowDefinition Height="Auto"/>
 					<RowDefinition/>
 				</Grid.RowDefinitions>
-				<ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
+				<ContentPresenter x:Uid="gastos" ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
 				<ListView
 					x:Name="LV_Gastos"
 					Grid.Row="1"

@@ -59,6 +59,7 @@ namespace JevoGastosUWP
 
         public MainPage()
         {
+
             this.InitializeComponent();
         }
         protected override void OnNavigatedTo(NavigationEventArgs e)
@@ -225,15 +226,39 @@ namespace JevoGastosUWP
 
         private void AddIngreso_Click(object sender, RoutedEventArgs e)
         {
-            AddIngreso(((AddEtiquetaForm)sender).TextBox.Text);
+            try
+            {
+                AddIngreso(((AddEtiquetaForm)sender).TextBox.Text);
+                AEF_Ingreso.IsErrorRaised = false;
+            }
+            catch (Exception)
+            {
+                AEF_Ingreso.IsErrorRaised = true;
+            }
         }
         private void AddCuenta_Click(object sender, RoutedEventArgs e)
         {
-            AddCuenta(((AddEtiquetaForm)sender).TextBox.Text);
+            try
+            {
+                AddCuenta(((AddEtiquetaForm)sender).TextBox.Text);
+                AEF_Cuenta.IsErrorRaised = false;
+            }
+            catch (Exception)
+            {
+                AEF_Cuenta.IsErrorRaised = true;
+            }
         }
         private void AddGasto_Click(object sender, RoutedEventArgs e)
         {
-            AddGasto(((AddEtiquetaForm)sender).TextBox.Text);
+            try
+            {
+                AddGasto(((AddEtiquetaForm)sender).TextBox.Text);
+                AEF_Gasto.IsErrorRaised = false;
+            }
+            catch (Exception)
+            {
+                AEF_Gasto.IsErrorRaised = true;
+            }
         }
         private void AddTransaccion_Click(object sender, RoutedEventArgs e)
         {
