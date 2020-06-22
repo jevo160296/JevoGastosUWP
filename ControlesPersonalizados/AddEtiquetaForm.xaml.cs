@@ -1,18 +1,7 @@
 ﻿using JevoGastosCore;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
-using Windows.UI.Xaml.Navigation;
 
 // La plantilla de elemento Control de usuario está documentada en https://go.microsoft.com/fwlink/?LinkId=234236
 
@@ -83,7 +72,7 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 new PropertyMetadata(false)
                 );
         #endregion
-
+        #region Properties
         public TipoEtiqueta TipoEtiqueta
         {
             get => (TipoEtiqueta)GetValue(TipoEtiquetaProperty);
@@ -133,6 +122,7 @@ namespace JevoGastosUWP.ControlesPersonalizados
             get => (bool)GetValue(IsErrorRaisedProperty);
             set => SetValue(IsErrorRaisedProperty, value);
         }
+        #endregion
 
         public AddEtiquetaForm()
         {
@@ -142,6 +132,7 @@ namespace JevoGastosUWP.ControlesPersonalizados
         private void B_Save_Click(object sender, RoutedEventArgs e)
         {
             Click?.Invoke(this, e);
+            TB_Name.Text = "";
         }
 
         public event RoutedEventHandler Click;

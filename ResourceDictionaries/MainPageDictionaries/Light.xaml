@@ -2,10 +2,21 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:JevoGastosUWP.ResourceDictionaries.MainPageDictionaries">
-    <SolidColorBrush x:Key="Brush_Accent1Background" Color="White"/>
-    <SolidColorBrush x:Key="Brush_Accent1Foreground" Color="{ThemeResource SystemAccentColor}"/>
+    <AcrylicBrush x:Key="Brush_Accent1Background" TintColor="{ThemeResource SystemAccentColor}" FallbackColor="{ThemeResource SystemAccentColor}" BackgroundSource="HostBackdrop" TintOpacity="0.7"/>
+    <SolidColorBrush x:Key="Brush_Accent1Foreground" Color="White"/>
     <SolidColorBrush x:Key="Brush_Accent2Background" Color="White"/>
     <SolidColorBrush x:Key="Brush_Accent2Foreground" Color="{ThemeResource SystemAccentColor}"/>
     <SolidColorBrush x:Key="Brush_Accent3Background" Color="White"/>
     <SolidColorBrush x:Key="Brush_Accent3Foreground" Color="{ThemeResource SystemAccentColorDark3}"/>
+
+    <SolidColorBrush x:Key="Brush_AppBackground1" Color="#F5F5F5"/>
+    <SolidColorBrush x:Key="Brush_AppBackground2" Color="#DDDDDD"/>
+    <SolidColorBrush x:Key="Brush_AppBackground3" Color="#EEEEEE"/>
+
+    <SolidColorBrush x:Key="Brush_ListViewBackground" Color="White"/>
+
+    <SolidColorBrush x:Key="Brush_PopupBorder" Color="Black"/>
+    <Thickness x:Key="Thickness_PopupThickness">
+        1
+    </Thickness>
 </ResourceDictionary>

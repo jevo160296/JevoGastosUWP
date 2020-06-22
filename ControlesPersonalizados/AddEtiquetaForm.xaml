@@ -7,11 +7,12 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
     HorizontalAlignment="Stretch"
-    VerticalAlignment="Stretch" d:DesignWidth="423.01"
-    
+    VerticalAlignment="Stretch" 
+    d:DesignWidth="423.01" 
+    d:DesignHeight="256"
     >
 
-    <StackPanel x:Name="SP_Main">
+    <StackPanel x:Name="SP_Main" CornerRadius="4" Background="{x:Bind Background,Mode=OneWay}" BorderThickness="{x:Bind BorderThickness,Mode=OneWay}" BorderBrush="{x:Bind BorderBrush,Mode=OneWay}">
         <Border 
             Background="{x:Bind HeaderBackground,Mode=OneWay}" 
             Padding="8">
