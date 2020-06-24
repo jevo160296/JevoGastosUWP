@@ -38,13 +38,18 @@ namespace JevoGastosUWP
             gastosContainer = await LoadContainerAsync();
             ProgressBar.IsIndeterminate = false;
             ProgressBar.Value = 1 / max*100;
+            TB_Detalles.Text = "Cargando transacciones...";
             await LoadTransaccionesAsync(gastosContainer);
             ProgressBar.Value = 2 / max*100;
+            TB_Detalles.Text = "Cargando etiquetas...";
             await LoadEtiquetasAsync(gastosContainer);
+            TB_Detalles.Text = "Cargando ingresos...";
             ProgressBar.Value = 3 / max*100;
             await LoadIngresosAsync(gastosContainer);
+            TB_Detalles.Text = "Cargando cuentas...";
             ProgressBar.Value = 4 / max*100;
             await LoadCuentasAsync(gastosContainer);
+            TB_Detalles.Text = "Cargando gastos...";
             ProgressBar.Value = 5 / max*100;
             await LoadGastosAsync(gastosContainer);
             ProgressBar.Value = 6 / max*100;
@@ -84,17 +89,18 @@ namespace JevoGastosUWP
 
         private GastosContainer LoadData()
         {
-            GastosContainer gastosContainer = new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
-            var transacciones = gastosContainer.TransaccionDAO.Items;
-            var etiquetas = gastosContainer.EtiquetaDAO.Items;
-            var ingresos = gastosContainer.IngresoDAO.Items;
-            var cuentas = gastosContainer.CuentaDAO.Items;
-            var gastos = gastosContainer.GastoDAO.Items;
+            GastosContainer gastosContainer = LoadContainer();
+            LoadTransacciones(gastosContainer);
+            LoadEtiquetas(gastosContainer);
+            LoadIngresos(gastosContainer);
+            LoadCuentas(gastosContainer);
+            LoadGastos(gastosContainer);
             return gastosContainer;
         }
         private GastosContainer LoadContainer()
         {
-            GastosContainer gastosContainer = new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+            GastosContainer gastosContainer = 
+                new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path,false);
             return gastosContainer;
         }
         private void LoadTransacciones(GastosContainer gastosContainer)

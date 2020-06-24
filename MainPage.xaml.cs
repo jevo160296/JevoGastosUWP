@@ -2,9 +2,11 @@
 using JevoGastosCore.Model;
 using JevoGastosCore.ModelView;
 using JevoGastosUWP.ControlesPersonalizados;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
@@ -43,6 +45,29 @@ namespace JevoGastosUWP
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
             }
         }
+        private class VisibleBool : INotifyPropertyChanged
+        {
+            private bool value;
+            public bool Value
+            {
+                get => value;
+                set
+                {
+                    this.value = value;
+                    OnPropertyChanged();
+                }
+                
+            }
+            public event PropertyChangedEventHandler PropertyChanged;
+            protected void OnPropertyChanged(string name = null)
+            {
+                PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+            }
+            public VisibleBool(bool value = false)
+            {
+                this.value = value;
+            }
+        }
 
         private ObservableCollection<Transaccion> relatedTrans = new ObservableCollection<Transaccion>();
 
@@ -57,17 +82,43 @@ namespace JevoGastosUWP
         private VisibilityHandler TipoSelected = new VisibilityHandler();
         private VisibilityHandler TheresOrigenes = new VisibilityHandler();
         private VisibilityHandler TheresDestinos = new VisibilityHandler();
+        private VisibleBool PendentChanges = new VisibleBool(false);
         private bool EditandoTrans = false;
 
         public MainPage()
         {
             this.InitializeComponent();
+            Windows.UI.Core.Preview.SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += MainPage_CloseRequested;
         }
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
             Container = (GastosContainer)e.Parameter;
             ConfigureView();
+        }
+        private async void MainPage_CloseRequested(object sender, Windows.UI.Core.Preview.SystemNavigationCloseRequestedPreviewEventArgs e)
+        {
+            var deferral = e.GetDeferral();
+            if (PendentChanges.Value)
+            {
+                CD_Salir.Visibility = Visibility.Visible;
+                ContentDialogResult contentDialogResult = await CD_Salir.ShowAsync();
+                switch (contentDialogResult)
+                {
+                    case ContentDialogResult.None:
+                        e.Handled = true;
+                        break;
+                    case ContentDialogResult.Primary:
+                        await SaveAllAsync();
+                        break;
+                    case ContentDialogResult.Secondary:
+                        break;
+                    default:
+                        break;
+                }
+            }
+            deferral.Complete();
         }
         private void ConfigureView()
         {
@@ -79,7 +130,25 @@ namespace JevoGastosUWP
             Ingresos.CollectionChanged += Etiquetas_CollectionChanged;
             Cuentas.CollectionChanged += Etiquetas_CollectionChanged;
             Gastos.CollectionChanged += Etiquetas_CollectionChanged;
+            Container.Context.ChangeTracker.StateChanged -= ChangeTracker_StateChanged;
+            Container.Context.ChangeTracker.StateChanged += ChangeTracker_StateChanged;
+            Container.Context.ChangeTracker.Tracked -= ChangeTracker_Tracked;
+            Container.Context.ChangeTracker.Tracked += ChangeTracker_Tracked;
         }
+
+        private void ChangeTracker_Tracked(object sender, Microsoft.EntityFrameworkCore.ChangeTracking.EntityTrackedEventArgs e)
+        {
+            PendentChanges.Value = true;
+        }
+
+        private void ChangeTracker_StateChanged(object sender, Microsoft.EntityFrameworkCore.ChangeTracking.EntityStateChangedEventArgs e)
+        {
+            if ((e.NewState==EntityState.Modified)| (e.NewState == EntityState.Added) | (e.NewState==EntityState.Deleted))
+            {
+                PendentChanges.Value = true;
+            }
+        }
+
         private void Etiquetas_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             CheckOrigenesDestinos();
@@ -301,6 +370,10 @@ namespace JevoGastosUWP
             Transaccion transaccion = (Transaccion)(((MenuFlyoutItem)sender).CommandParameter);
             Container.TransaccionDAO.Remove(transaccion);
         }
+        private void Trans_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
         private void AppBarCancelTransButton_Click(object sender, RoutedEventArgs e)
         {
             EditandoTrans = false;
@@ -433,6 +506,7 @@ namespace JevoGastosUWP
         {
             var deleteCommand = new StandardUICommand(StandardUICommandKind.None);
             var editCommand = new StandardUICommand(StandardUICommandKind.None);
+            var transCommand = new StandardUICommand(StandardUICommandKind.None);
             Etiqueta data = args.Item as Etiqueta;
             MenuFlyout menuFlyout = new MenuFlyout();
             MenuFlyoutItem eliminar = new MenuFlyoutItem()
@@ -449,12 +523,24 @@ namespace JevoGastosUWP
                 Command = editCommand,
                 CommandParameter = data
             };
+            MenuFlyoutSeparator sep = new MenuFlyoutSeparator();
+            MenuFlyoutItem trans = new MenuFlyoutItem()
+            {
+                Text = "Transacciones",
+                Icon = new SymbolIcon(Symbol.Bookmarks),
+                Command = transCommand,
+                CommandParameter = data
+            };
             eliminar.Click += Eliminar_Click;
             editar.Click += Editar_Click;
+            trans.Click += Trans_Click;
             menuFlyout.Items.Add(eliminar);
             menuFlyout.Items.Add(editar);
+            menuFlyout.Items.Add(sep);
+            menuFlyout.Items.Add(trans);
             args.ItemContainer.ContextFlyout = menuFlyout;
         }
+
         private void LV_Transacciones_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             var deleteCommand = new StandardUICommand(StandardUICommandKind.None);
@@ -556,6 +642,30 @@ namespace JevoGastosUWP
             Popup_IngresoForm.IsOpen = false;
             Popup_CuentaForm.IsOpen = false;
             Popup_GastoForm.IsOpen = false;
+        }
+
+        private async void ABB_Guardar_Click(object sender, RoutedEventArgs e)
+        {
+            bool terminado;
+            SP_Guardando.Visibility = Visibility.Visible;
+            ABB_Guardar.IsEnabled = false;
+            terminado = await SaveAllAsync();
+            SP_Guardando.Visibility = terminado ? Visibility.Collapsed : Visibility.Visible;
+            //ABB_Guardar.IsEnabled = true;
+        }
+        private async Task<bool> SaveAllAsync()
+        {
+            bool respuesta;
+            respuesta = await Task.Run(
+                () =>
+                {
+                    Container.SaveChanges();
+                    return true;
+                }
+                );
+            PendentChanges.Value = false;
+            //ABB_Guardar.IsEnabled = false;
+            return respuesta;
         }
     }
 }

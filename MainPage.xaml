@@ -191,7 +191,7 @@
                         </Grid.ColumnDefinitions>
                         <!--#endregion-->
                         <TextBlock Text="{x:Bind Path=Name}"/>
-                        <TextBlock Text="{x:Bind Path=Total,Converter={StaticResource doubletocurrency}}" Grid.Column="1" TextAlignment="Right"/>
+                        <TextBlock Text="{x:Bind Path=Total,Converter={StaticResource doubletocurrency},Mode=OneWay}" Grid.Column="1" TextAlignment="Right"/>
                     </Grid>
                 </DataTemplate>
                 <Style TargetType="ListView">
@@ -277,6 +277,13 @@
                     <Setter Property="Foreground" Value="{ThemeResource Brush_Accent1Foreground}"/>
                 </Style>
             </CommandBar.Resources>
+            <CommandBar.Content>
+                <StackPanel x:Name="SP_Guardando" Orientation="Horizontal" Height="40" Visibility="Collapsed" Padding="8 0 0 0" Spacing="8">
+                    <TextBlock Text="Guardando" Foreground="White" VerticalAlignment="Center"/>
+                    <ProgressRing x:Name="PR_Guardando" Width="32" Height="32" IsActive="True" Foreground="White"/>
+                </StackPanel>
+            </CommandBar.Content>
+            <AppBarButton x:Name="ABB_Guardar" IsEnabled="{x:Bind PendentChanges.Value,Mode=OneWay}" Label="Guardar" Icon="Save" RequestedTheme="Dark" Style="{StaticResource DefaultStyle}" Click="ABB_Guardar_Click"/>
             <AppBarButton x:Name="ABB_AddTrans" Label="Transacción" x:Uid="transaccion" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}" RequestedTheme="Dark">
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Key="T" Modifiers="Menu"/>
@@ -303,7 +310,6 @@
                                         <ComboBox x:Name="CB_Origen" HorizontalAlignment="Stretch" SelectionChanged="CB_Origen_SelectionChanged" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay}"/>
                                         <Button x:Name="B_Origen" Click="B_Origen_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
                                     </StackPanel>
-                                    
                                 </Grid>
                                 <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
                                     <StackPanel Spacing="4">
@@ -375,6 +381,16 @@
             SecondaryButtonText="No"
             DefaultButton="Secondary"
             Content="Está seguro de eliminar la etiqueta"
+            Grid.RowSpan="2"
+            Visibility="Collapsed"/>
+        <ContentDialog
+            x:Name="CD_Salir"
+            Title="¿Guardar antes de salir?"
+            PrimaryButtonText="Sí"
+            SecondaryButtonText="No"
+            CloseButtonText="Cancelar"
+            DefaultButton="Close"
+            Content="Si no guarda el trabajo se podrían perder datos"
             Grid.RowSpan="2"
             Visibility="Collapsed"/>
         <Popup
