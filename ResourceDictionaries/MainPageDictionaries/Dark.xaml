@@ -14,6 +14,7 @@
     <SolidColorBrush x:Key="Brush_AppBackground3" Color="#333333"/>
 
     <SolidColorBrush x:Key="Brush_ListViewBackground" Color="Black"/>
+    <SolidColorBrush x:Key="Brush_ListViewItemBackground" Color="Black"/>
 
     <SolidColorBrush x:Key="Brush_PopupBorder" Color="White"/>
     <Thickness x:Key="Thickness_PopupThickness">

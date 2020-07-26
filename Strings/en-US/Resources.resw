@@ -139,7 +139,7 @@
     <value>Expenses</value>
   </data>
   <data name="guardar.Label" xml:space="preserve">
-    <value>Save</value>
+    <value>Accept</value>
   </data>
   <data name="ingreso.Label" xml:space="preserve">
     <value>Income</value>
@@ -157,7 +157,7 @@
     <value>New account</value>
   </data>
   <data name="nuevacuenta.Label" xml:space="preserve">
-    <value>Save</value>
+    <value>Accept</value>
   </data>
   <data name="nuevatransaccion.Text" xml:space="preserve">
     <value>New transaction</value>
@@ -172,7 +172,7 @@
     <value>New expense</value>
   </data>
   <data name="nuevogasto.Label" xml:space="preserve">
-    <value>Save</value>
+    <value>Accept</value>
   </data>
   <data name="nuevoingreso.ErrorText" xml:space="preserve">
     <value>Error, the name already exists.</value>
@@ -184,7 +184,7 @@
     <value>New income</value>
   </data>
   <data name="nuevoingreso.Label" xml:space="preserve">
-    <value>Save</value>
+    <value>Accept</value>
   </data>
   <data name="transaccion.Label" xml:space="preserve">
     <value>Transaction</value>

@@ -1,9 +1,9 @@
 ﻿using JevoGastosCore;
+using JevoGastosCore.Model;
+using JevoGastosCore.ModelView.EtiquetaTypes;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;
-
-// La plantilla de elemento Control de usuario está documentada en https://go.microsoft.com/fwlink/?LinkId=234236
 
 namespace JevoGastosUWP.ControlesPersonalizados
 {
@@ -71,6 +71,20 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 typeof(UserControl),
                 new PropertyMetadata(false)
                 );
+        public static readonly DependencyProperty IconProperty =
+            DependencyProperty.Register(
+                "Icon",
+                typeof(IconElement),
+                typeof(UserControl),
+                new PropertyMetadata(new SymbolIcon(Symbol.Save))
+                );
+        public static readonly DependencyProperty EtiquetaProperty =
+            DependencyProperty.Register(
+                "Etiqueta",
+                typeof(Etiqueta),
+                typeof(UserControl),
+                new PropertyMetadata(null)
+                );
         #endregion
         #region Properties
         public TipoEtiqueta TipoEtiqueta
@@ -121,6 +135,16 @@ namespace JevoGastosUWP.ControlesPersonalizados
         {
             get => (bool)GetValue(IsErrorRaisedProperty);
             set => SetValue(IsErrorRaisedProperty, value);
+        }
+        public IconElement Icon
+        {
+            get => (IconElement)GetValue(IconProperty);
+            set => SetValue(IconProperty, value);
+        }
+        public Etiqueta Etiqueta 
+        {
+            get => (Etiqueta)GetValue(EtiquetaProperty);
+            set => SetValue(EtiquetaProperty, value);
         }
         #endregion
 

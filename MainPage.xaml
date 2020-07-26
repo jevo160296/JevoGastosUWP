@@ -6,6 +6,7 @@
     xmlns:PScontrols="using:JevoGastosUWP.ControlesPersonalizados"
     xmlns:core="using:JevoGastosCore.Model"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:lottie="using:Microsoft.Toolkit.Uwp.UI.Lottie"
     xmlns:converters="using:JevoGastosUWP.Converters" 
     xmlns:aux="using:JevoGastosUWP.Auxiliares"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -17,6 +18,10 @@
                 <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Dark.xaml" x:Key="Dark"/>
                 <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Light.xaml" x:Key="Light"/>
             </ResourceDictionary.ThemeDictionaries>
+            <converters:StringPrefix x:Key="prefix"/>
+            <converters:DoubleToCurrency x:Key="doubletocurrency"/>
+            <converters:NotGate x:Key="notgate"/>
+            <converters:DateToString x:Key="datetostring"/>
             <Style TargetType="ListViewItem" x:Key="ContentStretched_Items">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -122,10 +127,11 @@
                 <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
                 <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
                 <Setter Property="ScrollViewer.ZoomMode" Value="Disabled"/>
+                <Setter Property="CornerRadius" Value="4"/>
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="FlyoutPresenter">
-                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                            <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="{TemplateBinding CornerRadius}">
                                 <ScrollViewer x:Name="ScrollViewer" AutomationProperties.AccessibilityView="Raw" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}" VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" ZoomMode="{TemplateBinding ScrollViewer.ZoomMode}">
                                     <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentTransitions="{TemplateBinding ContentTransitions}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
                                 </ScrollViewer>
@@ -143,17 +149,125 @@
                 <Setter Property="Background" Value="{ThemeResource AppBarBackgroundThemeBrush}"/>
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush_PopupBorder}"/>
                 <Setter Property="BorderThickness" Value="{ThemeResource Thickness_PopupThickness}"/>
+                <Setter Property="Label" Value="Listo"/>
+                <Setter Property="Icon" Value="Accept"/>
             </Style>
-            <converters:DoubleToCurrency x:Key="doubletocurrency"/>
-            <converters:NotGate x:Key="notgate"/>
+            <Style TargetType="ListView" x:Key="ListViewBasic">
+                <Setter Property="ItemContainerStyle" Value="{StaticResource ContentStretched_Items}"/>
+                <Setter Property="SelectionMode" Value="None"/>
+                <Setter Property="CornerRadius" Value="0 0 4 4"/>
+                <Setter Property="Background" Value="{ThemeResource Brush_ListViewBackground}"/>
+            </Style>
+            <Style TargetType="Button" x:Key="StyleClearButton">
+                <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="CornerRadius" Value="0 4 0 0"/>
+                <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+                <Setter Property="Content" Value="&#xE894;"/>
+                <Setter Property="Background" Value="{ThemeResource Brush_Accent3Background}"/>
+                <Setter Property="Foreground" Value="{ThemeResource Brush_Accent3Foreground}"/>
+                <Setter Property="ToolTipService.ToolTip" Value="Eliminar todo"/>
+            </Style>
+            <DataTemplate x:Name="ListTemplate" x:DataType="x:String" >
+                <Border HorizontalAlignment="Stretch" Background="{ThemeResource Brush_Accent3Background}" Padding="4" CornerRadius="4 0 0 0">
+                    <TextBlock 
+                            Text="{Binding}" 
+                            Foreground="{ThemeResource Brush_Accent3Foreground}" 
+                            HorizontalAlignment="Stretch" 
+                            HorizontalTextAlignment="Center" 
+                            FontWeight="Bold"/>
+                </Border>
+            </DataTemplate>
+            <DataTemplate x:Name="EtiquetaTemplate" x:DataType="core:Etiqueta">
+                <Grid HorizontalAlignment="Stretch" Background="{ThemeResource Brush_ListViewItemBackground}">
+                    <!--#region Configuración-->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <!--#endregion-->
+                    <TextBlock Text="{x:Bind Path=Name,Mode=OneWay}"/>
+                    <TextBlock Text="{x:Bind Path=Total,Converter={StaticResource doubletocurrency},Mode=OneWay}" Grid.Column="1" TextAlignment="Right"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Name="TransaccionesLargeTemplate" x:DataType="core:Transaccion">
+                <Grid HorizontalAlignment="Stretch" Padding="0 2 0 2" Background="{ThemeResource Brush_ListViewItemBackground}">
+                    <!--#region Configuración-->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="90" Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!--#endregion-->
+                    <TextBlock Text="{x:Bind Fecha,Mode=OneWay,Converter={StaticResource datetostring}}" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind Origen.Name,Mode=OneWay,ConverterParameter=Origen: ,Converter={StaticResource prefix}}" Grid.Column="1"/>
+                    <TextBlock Text="{x:Bind Destino.Name,Mode=OneWay,Converter={StaticResource prefix},ConverterParameter=Destino: }" Grid.Column="1" Grid.Row="1"/>
+                    <TextBlock Text="{x:Bind Valor,Mode=OneWay,Converter={StaticResource doubletocurrency}}" Grid.Column="2" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind Descripcion,Mode=OneWay}" Grid.Column="3" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
+            <DataTemplate x:Name="TransaccionesTinyTemplate" x:DataType="core:Transaccion">
+                <Grid HorizontalAlignment="Stretch" Padding="0 2 0 2" Background="{ThemeResource Brush_ListViewItemBackground}">
+                    <!--#region Configuración-->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MinWidth="90" Width="1*"/>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="2*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!--#endregion-->
+                    <TextBlock Text="{x:Bind Fecha,Mode=OneWay,Converter={StaticResource datetostring}}" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                    <TextBlock Text="{x:Bind Origen.Name,Mode=OneWay,Converter={StaticResource prefix},ConverterParameter=Origen: }" Grid.Column="1"/>
+                    <TextBlock Text="{x:Bind Destino.Name,Mode=OneWay,Converter={StaticResource prefix},ConverterParameter=Destino: }" Grid.Column="1" Grid.Row="1"/>
+                    <TextBlock Text="{x:Bind Valor,Mode=OneWay,Converter={StaticResource doubletocurrency}}" Grid.Column="2" Grid.RowSpan="2" VerticalAlignment="Center"/>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </Page.Resources>
-    <Grid RowSpacing="8" Background="{ThemeResource Brush_AppBackground1}">
+    <Grid x:Name="G_BaseGrid" RowSpacing="8" Background="{ThemeResource Brush_AppBackground1}">
         <!--#region Configuracion-->
         <Grid.RowDefinitions>
             <RowDefinition Height="1*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <FlyoutBase.AttachedFlyout>
+            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones relacionadas" Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
+                    <Button Style="{StaticResource StyleClearButton}" Click="ClearRelaTrans_Click" Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}" Grid.Column="1"/>
+                    <ListView
+                        x:Name="LV_RelatedTrans"
+                        ItemsSource="{x:Bind RelatedTrans}"
+                        ContainerContentChanging="LV_Transacciones_ContainerContentChanging"
+                        MaxHeight="240"
+                        Width="320"
+                        Style="{StaticResource ListViewBasic}"
+                        ItemTemplate="{StaticResource TransaccionesTinyTemplate}"
+                        Grid.ColumnSpan="2"
+                        Grid.Row="1"
+                        Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
+                    <muxc:AnimatedVisualPlayer x:Name="EmptyEtiquetasLottie" Width="80" Height="80" Margin="80 80 80 0" Visibility="{x:Bind EmptyRelated.Visibility,Mode=OneWay}">
+                        <lottie:LottieVisualSource x:Name="LottieEmptyEtiquetas" UriSource="ms-appx:///Lottie/Empty.json"/>
+                    </muxc:AnimatedVisualPlayer>
+                    <TextBlock Text="Vacío" HorizontalAlignment="Center" Padding="0 2 0 2" Visibility="{x:Bind EmptyRelated.Visibility,Mode=OneWay}" Margin="80 8 80 80" Grid.Row="1"/>
+                </Grid>
+            </Flyout>
+        </FlyoutBase.AttachedFlyout>
         <!--#endregion-->
         <Grid
             Grid.Row="0"
@@ -171,36 +285,6 @@
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <Grid.Resources>
-                <DataTemplate x:Name="ListTemplate" x:DataType="x:String">
-                    <Border HorizontalAlignment="Stretch" Background="{ThemeResource Brush_Accent3Background}" Padding="4" CornerRadius="4 4 0 0">
-                        <TextBlock 
-                            Text="{Binding}" 
-                            Foreground="{ThemeResource Brush_Accent3Foreground}" 
-                            HorizontalAlignment="Stretch" 
-                            HorizontalTextAlignment="Center" 
-                            FontWeight="Bold"/>
-                    </Border>
-                </DataTemplate>
-                <DataTemplate x:Name="EtiquetaTemplate" x:DataType="core:Etiqueta">
-                    <Grid HorizontalAlignment="Stretch">
-                        <!--#region Configuración-->
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="1*"/>
-                            <ColumnDefinition Width="2*"/>
-                        </Grid.ColumnDefinitions>
-                        <!--#endregion-->
-                        <TextBlock Text="{x:Bind Path=Name}"/>
-                        <TextBlock Text="{x:Bind Path=Total,Converter={StaticResource doubletocurrency},Mode=OneWay}" Grid.Column="1" TextAlignment="Right"/>
-                    </Grid>
-                </DataTemplate>
-                <Style TargetType="ListView">
-                    <Setter Property="ItemContainerStyle" Value="{StaticResource ContentStretched_Items}"/>
-                    <Setter Property="SelectionMode" Value="None"/>
-                    <Setter Property="CornerRadius" Value="0 0 4 4"/>
-                    <Setter Property="Background" Value="{ThemeResource Brush_ListViewBackground}"/>
-                </Style>
-            </Grid.Resources>
             <!--#endregion-->
             <Grid
                 Grid.Row="0"
@@ -209,13 +293,20 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <ContentPresenter x:Uid="ingresos" ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearIngresos_Click"/>
                 <ListView 
                     x:Name="LV_Ingresos"
                     Grid.Row="1"
+                    Grid.ColumnSpan="2"
                     ItemsSource="{x:Bind Ingresos}"
                     ItemTemplate="{StaticResource EtiquetaTemplate}"
                     ContainerContentChanging="LV_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"
                     />
             </Grid>
             <Grid
@@ -224,13 +315,20 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearCuentas_Click"/>
                 <ListView
                     x:Name="LV_Cuentas"
                     ItemsSource="{x:Bind Cuentas}"
                     Grid.Row="1"
+                    Grid.ColumnSpan="2"
                     ItemTemplate="{StaticResource EtiquetaTemplate}"
-                    ContainerContentChanging="LV_ContainerContentChanging"/>
+                    ContainerContentChanging="LV_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"/>
             </Grid>
             <Grid
                 Grid.Row="2"
@@ -239,13 +337,20 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <ContentPresenter x:Uid="gastos" ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearGastos_Click"/>
                 <ListView
                     x:Name="LV_Gastos"
                     Grid.Row="1"
+                    Grid.ColumnSpan="2"
                     ItemsSource="{x:Bind Gastos}"
                     ItemTemplate="{StaticResource EtiquetaTemplate}" 
                     ContainerContentChanging="LV_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"
                 />
             </Grid>
             <Grid
@@ -256,12 +361,20 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                 </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
                 <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearTransacciones_Click"/>
                 <ListView
                     x:Name="LV_Transacciones"
                     Grid.Row="1"
+                    Grid.ColumnSpan="2"
                     ItemsSource="{x:Bind Transacciones}"
-                    ContainerContentChanging="LV_Transacciones_ContainerContentChanging"/>
+                    ItemTemplate="{StaticResource TransaccionesLargeTemplate}"
+                    ContainerContentChanging="LV_Transacciones_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"/>
             </Grid>
         </Grid>
         <CommandBar 
@@ -283,7 +396,11 @@
                     <ProgressRing x:Name="PR_Guardando" Width="32" Height="32" IsActive="True" Foreground="White"/>
                 </StackPanel>
             </CommandBar.Content>
-            <AppBarButton x:Name="ABB_Guardar" IsEnabled="{x:Bind PendentChanges.Value,Mode=OneWay}" Label="Guardar" Icon="Save" RequestedTheme="Dark" Style="{StaticResource DefaultStyle}" Click="ABB_Guardar_Click"/>
+            <AppBarButton x:Name="ABB_Guardar" IsEnabled="{x:Bind PendentChanges.Value,Mode=OneWay}" Label="Guardar" Icon="Save" RequestedTheme="Dark" Style="{StaticResource DefaultStyle}" Click="ABB_Guardar_Click">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="G" Modifiers="Control"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
             <AppBarButton x:Name="ABB_AddTrans" Label="Transacción" x:Uid="transaccion" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}" RequestedTheme="Dark">
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Key="T" Modifiers="Menu"/>
@@ -318,7 +435,6 @@
                                         <Button x:Name="B_Destino" Click="B_Destino_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresDestinos.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
                                     </StackPanel>
                                 </Grid>
-                                
                                 <muxc:NumberBox 
                                     x:Name="TB_Valor" 
                                     Header="Valor" 
@@ -327,11 +443,12 @@
                                     ValidationMode="InvalidInputOverwritten"
                                     ValueChanged="TB_Valor_ValueChanged"
                                     HorizontalAlignment="Stretch" 
-                                    Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" />
+                                    Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}"
+                                    />
                                 <TextBox x:Name="TB_Descripcion" Header="Descripción" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" PlaceholderText="Descripción"/>
                             </StackPanel>
                             <CommandBar DefaultLabelPosition="Right">
-                                <AppBarButton x:Uid="guardar" x:Name="APB_GuardarTrans" Label="Guardar" Icon="Save" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False">
+                                <AppBarButton x:Uid="guardar" x:Name="APB_GuardarTrans" Label="Listo" Icon="Accept" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False">
                                     <AppBarButton.KeyboardAccelerators>
                                         <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SP_AddTransaccion}"/>
                                     </AppBarButton.KeyboardAccelerators>
@@ -374,6 +491,14 @@
             </CommandBar.SecondaryCommands>
         </CommandBar>
         <!--#region Dialogs & Popups-->
+        <ContentDialog
+            x:Name="CD_Clear"
+            Title="Eliminar todo"
+            PrimaryButtonText="Sí"
+            SecondaryButtonText="No"
+            DefaultButton="Secondary"
+            Grid.RowSpan="2"
+            Visibility="Visible"/>
         <ContentDialog
             x:Name="CD_Eliminar"
             Title="Eliminar"
@@ -469,6 +594,31 @@
                 HeaderText="Nuevo gasto"
                 Click="AddGasto_Click"
                             />
+        </Popup>
+        <Popup
+            x:Name="Popup_EtiquetaEditForm"
+            IsOpen="False" 
+            IsLightDismissEnabled="True" 
+            LightDismissOverlayMode="On" 
+            Grid.RowSpan="2"
+            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
+            Translation="0,0,32">
+            <Popup.Shadow>
+                <ThemeShadow/>
+            </Popup.Shadow>
+            <Popup.ChildTransitions>
+                <TransitionCollection>
+                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
+                </TransitionCollection>
+            </Popup.ChildTransitions>
+            <PScontrols:AddEtiquetaForm
+                x:Name="AEF_EtiquetaEdit"
+                TipoEtiqueta="Ingreso"
+                Style="{StaticResource EtiquetaFormStyle}"
+                HeaderText="Editar Nombre"
+                Click="EditEtiqueta_Click"
+                Label="Listo"
+                Icon="Accept"/>
         </Popup>
         <!--#endregion-->
     </Grid>

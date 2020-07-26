@@ -31,7 +31,7 @@
                 x:Name="B_Save"
                 Click="B_Save_Click"
                 Label="{x:Bind Label}"
-                Icon="Save"
+                Icon="{x:Bind Icon}"
                 >
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SP_Main}"/>
