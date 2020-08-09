@@ -150,7 +150,6 @@
                 <Setter Property="BorderBrush" Value="{ThemeResource Brush_PopupBorder}"/>
                 <Setter Property="BorderThickness" Value="{ThemeResource Thickness_PopupThickness}"/>
                 <Setter Property="Label" Value="Listo"/>
-                <Setter Property="Icon" Value="Accept"/>
             </Style>
             <Style TargetType="ListView" x:Key="ListViewBasic">
                 <Setter Property="ItemContainerStyle" Value="{StaticResource ContentStretched_Items}"/>
@@ -158,8 +157,16 @@
                 <Setter Property="CornerRadius" Value="0 0 4 4"/>
                 <Setter Property="Background" Value="{ThemeResource Brush_ListViewBackground}"/>
             </Style>
-            <Style TargetType="Button" x:Key="StyleClearButton">
+            <Style TargetType="Button" x:Key="StyleAddButton">
                 <Setter Property="Grid.Column" Value="1"/>
+                <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
+                <Setter Property="Content" Value="&#xE710;"/>
+                <Setter Property="Background" Value="{ThemeResource Brush_Accent3Background}"/>
+                <Setter Property="Foreground" Value="{ThemeResource Brush_Accent3Foreground}"/>
+                <Setter Property="ToolTipService.ToolTip" Value="Añadir"/>
+            </Style>
+            <Style TargetType="Button" x:Key="StyleClearButton">
+                <Setter Property="Grid.Column" Value="2"/>
                 <Setter Property="CornerRadius" Value="0 4 0 0"/>
                 <Setter Property="FontFamily" Value="Segoe MDL2 Assets"/>
                 <Setter Property="Content" Value="&#xE894;"/>
@@ -278,16 +285,17 @@
             <!--#region Congiguración-->
             <Grid.ColumnDefinitions>
                 <ColumnDefinition MaxWidth="256"/>
+                <ColumnDefinition MaxWidth="256"/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
-                <RowDefinition/>
                 <RowDefinition/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
             <!--#endregion-->
             <Grid
                 Grid.Row="0"
+                Grid.Column="0"
                 >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -296,13 +304,15 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter x:Uid="ingresos" ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
+                <Button Style="{StaticResource StyleAddButton}" Click="ShowIngresoForm_Click"/>
                 <Button Style="{StaticResource StyleClearButton}" Click="ClearIngresos_Click"/>
                 <ListView 
                     x:Name="LV_Ingresos"
                     Grid.Row="1"
-                    Grid.ColumnSpan="2"
+                    Grid.ColumnSpan="3"
                     ItemsSource="{x:Bind Ingresos}"
                     ItemTemplate="{StaticResource EtiquetaTemplate}"
                     ContainerContentChanging="LV_ContainerContentChanging"
@@ -310,28 +320,8 @@
                     />
             </Grid>
             <Grid
-                Grid.Row="1">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearCuentas_Click"/>
-                <ListView
-                    x:Name="LV_Cuentas"
-                    ItemsSource="{x:Bind Cuentas}"
-                    Grid.Row="1"
-                    Grid.ColumnSpan="2"
-                    ItemTemplate="{StaticResource EtiquetaTemplate}"
-                    ContainerContentChanging="LV_ContainerContentChanging"
-                    Style="{StaticResource ListViewBasic}"/>
-            </Grid>
-            <Grid
-                Grid.Row="2"
+                Grid.Row="0"
+                Grid.Column="1"
                 >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -340,13 +330,40 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="1*"/>
                     <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
+                <Button Style="{StaticResource StyleAddButton}" Click="ShowCuentaForm_Click"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearCuentas_Click"/>
+                <ListView
+                    x:Name="LV_Cuentas"
+                    ItemsSource="{x:Bind Cuentas}"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    ItemTemplate="{StaticResource EtiquetaTemplate}"
+                    ContainerContentChanging="LV_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"/>
+            </Grid>
+            <Grid
+                Grid.Row="1"
+                Grid.Column="0"
+                >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <ContentPresenter x:Uid="gastos" ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
+                <Button Style="{StaticResource StyleAddButton}" Click="ShowGastoForm_Click"/>
                 <Button Style="{StaticResource StyleClearButton}" Click="ClearGastos_Click"/>
                 <ListView
                     x:Name="LV_Gastos"
                     Grid.Row="1"
-                    Grid.ColumnSpan="2"
+                    Grid.ColumnSpan="3"
                     ItemsSource="{x:Bind Gastos}"
                     ItemTemplate="{StaticResource EtiquetaTemplate}" 
                     ContainerContentChanging="LV_ContainerContentChanging"
@@ -354,8 +371,34 @@
                 />
             </Grid>
             <Grid
+                Grid.Row="1"
                 Grid.Column="1"
-                Grid.RowSpan="3"
+                >
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ContentPresenter x:Uid="creditos" ContentTemplate="{StaticResource ListTemplate}" Content="Creditos"/>
+                <Button Style="{StaticResource StyleAddButton}" Click="ShowCreditoForm_Click"/>
+                <Button Style="{StaticResource StyleClearButton}" Click="ClearCreditos_Click"/>
+                <ListView
+                    x:Name="LV_Creditos"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="3"
+                    ItemsSource="{x:Bind Creditos}"
+                    ItemTemplate="{StaticResource EtiquetaTemplate}" 
+                    ContainerContentChanging="LV_ContainerContentChanging"
+                    Style="{StaticResource ListViewBasic}"
+                />
+            </Grid>
+            <Grid
+                Grid.Column="2"
+                Grid.RowSpan="2"
                 >
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -419,6 +462,8 @@
                                     <x:String>Entrada</x:String>
                                     <x:String>Movimiento</x:String>
                                     <x:String>Salida</x:String>
+                                    <x:String>Prestamo</x:String>
+                                    <x:String>Pago</x:String>
                                 </ComboBox>
                                 <CalendarDatePicker x:Name="CDP_Fecha" Header="Fecha" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" DateChanged="CDP_Fecha_DateChanged"/>
                                 <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
@@ -488,6 +533,14 @@
                         <KeyboardAccelerator Key="G" Modifiers="Menu" />
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
+                <AppBarButton x:Uid="credito" Label="Credito" AllowFocusOnInteraction="True" Click="ShowCreditoForm_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8C7;"/>
+                    </AppBarButton.Icon>
+                    <AppBarButton.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="C" Modifiers="Menu" />
+                    </AppBarButton.KeyboardAccelerators>
+                </AppBarButton>
             </CommandBar.SecondaryCommands>
         </CommandBar>
         <!--#region Dialogs & Popups-->
@@ -518,6 +571,7 @@
             Content="Si no guarda el trabajo se podrían perder datos"
             Grid.RowSpan="2"
             Visibility="Collapsed"/>
+
         <Popup
             x:Name="Popup_IngresoForm"
             IsOpen="False"
@@ -539,6 +593,7 @@
                 x:Uid="nuevoingreso"
                 TipoEtiqueta="Ingreso" 
                 Style="{StaticResource EtiquetaFormStyle}"
+                Icon="Accept"
                 HeaderText="Nueva fuente de ingresos"
                 Click="AddIngreso_Click"
                             />
@@ -565,6 +620,7 @@
                 x:Uid="nuevacuenta"
                 TipoEtiqueta="Cuenta"
                 Style="{StaticResource EtiquetaFormStyle}"
+                Icon="Accept"
                 HeaderText="Nueva cuenta"
                 Click="AddCuenta_Click"
                             />
@@ -591,10 +647,39 @@
                 x:Uid="nuevogasto"
                 TipoEtiqueta="Gasto"
                 Style="{StaticResource EtiquetaFormStyle}"
+                Icon="Accept"
                 HeaderText="Nuevo gasto"
                 Click="AddGasto_Click"
                             />
         </Popup>
+        <Popup 
+            x:Name="Popup_CreditoForm" 
+            IsOpen="False" 
+            IsLightDismissEnabled="True" 
+            LightDismissOverlayMode="On" 
+            Grid.RowSpan="2"
+            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
+            Translation="0,0,32"
+            >
+            <Popup.Shadow>
+                <ThemeShadow/>
+            </Popup.Shadow>
+            <Popup.ChildTransitions>
+                <TransitionCollection>
+                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
+                </TransitionCollection>
+            </Popup.ChildTransitions>
+            <PScontrols:AddEtiquetaForm 
+                x:Name="AEF_Credito" 
+                x:Uid="nuevocredito"
+                TipoEtiqueta="Credito"
+                Style="{StaticResource EtiquetaFormStyle}"
+                Icon="Accept"
+                HeaderText="Nuevo credito"
+                Click="AddCredito_Click"
+                            />
+        </Popup>
+
         <Popup
             x:Name="Popup_EtiquetaEditForm"
             IsOpen="False" 

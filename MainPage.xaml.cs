@@ -87,6 +87,7 @@ namespace JevoGastosUWP
         private ObservableCollection<Ingreso> Ingresos => Container.IngresoDAO.Items;
         private ObservableCollection<Cuenta> Cuentas => Container.CuentaDAO.Items;
         private ObservableCollection<Gasto> Gastos => Container.GastoDAO.Items;
+        private ObservableCollection<Credito> Creditos => Container.CreditoDAO.Items;
         private ObservableCollection<Transaccion> Transacciones => Container.TransaccionDAO.Items;
         private ObservableCollection<Transaccion> RelatedTrans => relatedTrans;
         private VisibilityHandler ErrorVisibility = new VisibilityHandler();
@@ -140,9 +141,11 @@ namespace JevoGastosUWP
             Ingresos.CollectionChanged -= Etiquetas_CollectionChanged;
             Cuentas.CollectionChanged -= Etiquetas_CollectionChanged;
             Gastos.CollectionChanged -= Etiquetas_CollectionChanged;
+            Creditos.CollectionChanged -= Etiquetas_CollectionChanged;
             Ingresos.CollectionChanged += Etiquetas_CollectionChanged;
             Cuentas.CollectionChanged += Etiquetas_CollectionChanged;
             Gastos.CollectionChanged += Etiquetas_CollectionChanged;
+            Creditos.CollectionChanged += Etiquetas_CollectionChanged;
             Container.Context.ChangeTracker.StateChanged -= ChangeTracker_StateChanged;
             Container.Context.ChangeTracker.StateChanged += ChangeTracker_StateChanged;
             Container.Context.ChangeTracker.Tracked -= ChangeTracker_Tracked;
@@ -225,6 +228,10 @@ namespace JevoGastosUWP
         private void AddGasto(string name)
         {
             Container.GastoDAO.Add(name);
+        }
+        private void AddCredito(string name)
+        {
+            Container.CreditoDAO.Add(name);
         }
         private void AddTransaccion(Etiqueta Origen, Etiqueta Destino, double valor, string descripcion = null, DateTime? dateTime = null)
         {
@@ -349,6 +356,19 @@ namespace JevoGastosUWP
                 AEF_Gasto.IsErrorRaised = true;
             }
         }
+        
+        private void AddCredito_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                AddCredito(((AddEtiquetaForm)sender).TextBox.Text);
+                AEF_Credito.IsErrorRaised = false;
+            }
+            catch (Exception)
+            {
+                AEF_Credito.IsErrorRaised = true;
+            }
+        }
         private void AddTransaccion_Click(object sender, RoutedEventArgs e)
         {
             double valor;
@@ -445,6 +465,14 @@ namespace JevoGastosUWP
                 case 2:
                     ShowCuentaForm();
                     break;
+                //Prestamo
+                case 3:
+                    ShowCreditoForm();
+                    break;
+                //Pago
+                case 4:
+                    ShowCuentaForm();
+                    break;
                 default:
                     break;
             }
@@ -464,6 +492,14 @@ namespace JevoGastosUWP
                 //Salida
                 case 2:
                     ShowGastoForm();
+                    break;
+                //Prestamo
+                case 3:
+                    ShowCuentaForm();
+                    break;
+                //Pago
+                case 4:
+                    ShowCreditoForm();
                     break;
                 default:
                     break;
@@ -539,6 +575,24 @@ namespace JevoGastosUWP
                         CB_Destino.PlaceholderText = "Gastos";
                         B_Origen.Content = "Nueva Cuenta";
                         B_Destino.Content = "Nuevo Gasto";
+                        break;
+                    //Prestamo
+                    case 3:
+                        CB_Origen.ItemsSource = Creditos;
+                        CB_Destino.ItemsSource = Cuentas;
+                        CB_Origen.PlaceholderText = "Creditos";
+                        CB_Destino.PlaceholderText = "Cuentas";
+                        B_Origen.Content = "Nuevo credito";
+                        B_Destino.Content = "Nueva cuenta";
+                        break;
+                    //Pago
+                    case 4:
+                        CB_Origen.ItemsSource = Cuentas;
+                        CB_Destino.ItemsSource = Creditos;
+                        CB_Origen.PlaceholderText = "Cuentas";
+                        CB_Destino.PlaceholderText = "Creditos";
+                        B_Origen.Content = "Nueva cuenta";
+                        B_Destino.Content = "Nuevo credito";
                         break;
                     default:
                         break;
@@ -668,6 +722,10 @@ namespace JevoGastosUWP
         {
             ShowGastoForm();
         }
+        private void ShowCreditoForm_Click(object sender, RoutedEventArgs e)
+        {
+            ShowCreditoForm();
+        }
         private void ShowIngresoForm()
         {
             ResetPopups();
@@ -686,6 +744,12 @@ namespace JevoGastosUWP
             Popup_GastoForm.IsOpen = true;
             AEF_Gasto.Focus(FocusState.Programmatic);
         }
+        private void ShowCreditoForm()
+        {
+            ResetPopups();
+            Popup_CreditoForm.IsOpen = true;
+            AEF_Credito.Focus(FocusState.Programmatic);
+        }
         private void ShowEtiquetaEditForm()
         {
             ResetPopups();
@@ -697,6 +761,7 @@ namespace JevoGastosUWP
             Popup_IngresoForm.IsOpen = false;
             Popup_CuentaForm.IsOpen = false;
             Popup_GastoForm.IsOpen = false;
+            Popup_CreditoForm.IsOpen = false;
             Popup_EtiquetaEditForm.IsOpen = false;
         }
 
@@ -739,6 +804,10 @@ namespace JevoGastosUWP
         private async void ClearGastos_Click(object sender, RoutedEventArgs e)
         {
             await ClearEtiquetas(TipoEtiqueta.Gasto, "¿Desea eliminar todas las etiquetas de gasto?");
+        }
+        private async void ClearCreditos_Click(object sender, RoutedEventArgs e)
+        {
+            await ClearEtiquetas(TipoEtiqueta.Credito, "¿Desea eliminar todas las etiquetas de credito?");
         }
 
         private async void ClearTransacciones_Click(object sender, RoutedEventArgs e)
