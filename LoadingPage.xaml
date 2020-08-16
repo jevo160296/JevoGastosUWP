@@ -38,7 +38,7 @@
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
             <muxc:ProgressBar x:Name="ProgressBar" Height="10" Value="0" IsIndeterminate="True" Foreground="#3C096C" Background="White"/>
             <TextBlock Text="Cargando datos..." HorizontalAlignment="Center" Style="{StaticResource HeaderTextBlockStyle}" Foreground="White"/>
-            <TextBlock x:Name="TB_Detalles" Text="Cargando contexto..." Foreground="White"/>
+            <TextBlock x:Name="TB_Detalles" Text="Abriendo base de datos..." Foreground="White"/>
         </StackPanel>
     </Grid>
 </Page>

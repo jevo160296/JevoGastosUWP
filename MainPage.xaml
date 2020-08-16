@@ -434,10 +434,19 @@
                 </Style>
             </CommandBar.Resources>
             <CommandBar.Content>
-                <StackPanel x:Name="SP_Guardando" Orientation="Horizontal" Height="40" Visibility="Collapsed" Padding="8 0 0 0" Spacing="8">
-                    <TextBlock Text="Guardando" Foreground="White" VerticalAlignment="Center"/>
-                    <ProgressRing x:Name="PR_Guardando" Width="32" Height="32" IsActive="True" Foreground="White"/>
-                </StackPanel>
+                <Grid Height="40" ColumnSpacing="4">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Text="Libre" VerticalAlignment="Center" Foreground="White" Margin="8 0 0 0"/>
+                    <TextBlock Text="{x:Bind Container.Medidas.Libre,Mode=OneWay,Converter={StaticResource doubletocurrency}}" VerticalAlignment="Center" Grid.Column="1" Foreground="White"/>
+                    <StackPanel x:Name="SP_Guardando" Orientation="Horizontal" Height="40" Visibility="Collapsed" Padding="8 0 0 0" Spacing="8" Grid.Column="2">
+                        <TextBlock Text="Guardando" Foreground="White" VerticalAlignment="Center"/>
+                        <ProgressRing x:Name="PR_Guardando" Width="32" Height="32" IsActive="True" Foreground="White"/>
+                    </StackPanel>
+                </Grid>
             </CommandBar.Content>
             <AppBarButton x:Name="ABB_Guardar" IsEnabled="{x:Bind PendentChanges.Value,Mode=OneWay}" Label="Guardar" Icon="Save" RequestedTheme="Dark" Style="{StaticResource DefaultStyle}" Click="ABB_Guardar_Click">
                 <AppBarButton.KeyboardAccelerators>

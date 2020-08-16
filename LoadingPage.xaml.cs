@@ -1,18 +1,7 @@
 ﻿using JevoGastosCore;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
-using Windows.UI.Xaml.Controls.Primitives;
-using Windows.UI.Xaml.Data;
-using Windows.UI.Xaml.Input;
-using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
 
 // La plantilla de elemento Página en blanco está documentada en https://go.microsoft.com/fwlink/?LinkId=234238
@@ -33,7 +22,7 @@ namespace JevoGastosUWP
         {
             base.OnNavigatedTo(e);
             GastosContainer gastosContainer;
-            double max = 6;
+            double max = 7;
             //gastosContainer = await LoadDataAsync();
             gastosContainer = await LoadContainerAsync();
             ProgressBar.IsIndeterminate = false;
@@ -52,7 +41,10 @@ namespace JevoGastosUWP
             TB_Detalles.Text = "Cargando gastos...";
             ProgressBar.Value = 5 / max*100;
             await LoadGastosAsync(gastosContainer);
-            ProgressBar.Value = 6 / max*100;
+            TB_Detalles.Text = "Cargando plan...";
+            ProgressBar.Value = 6 / max * 100;
+            await LoadPlanesAsync(gastosContainer);
+            ProgressBar.Value = 7 / max*100;
             this.Frame.Navigate(typeof(MainPage), gastosContainer);
         }
 
@@ -85,6 +77,10 @@ namespace JevoGastosUWP
         private async Task LoadGastosAsync(GastosContainer gastosContainer)
         {
             await Task.Run(() => LoadGastos(gastosContainer));
+        }
+        private async Task LoadPlanesAsync(GastosContainer gastosContainer)
+        {
+            await Task.Run(() => LoadPlanes(gastosContainer));
         }
 
         private GastosContainer LoadData()
@@ -122,6 +118,10 @@ namespace JevoGastosUWP
         private void LoadGastos(GastosContainer gastosContainer)
         {
             var gastos = gastosContainer.GastoDAO.Items;
+        }
+        private void LoadPlanes(GastosContainer gastosContainer)
+        {
+            var planes = gastosContainer.PlanDAO.Items;
         }
     }
 }
