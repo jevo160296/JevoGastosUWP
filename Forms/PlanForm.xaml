@@ -1,0 +1,74 @@
+﻿<Page
+    x:Class="JevoGastosUWP.Forms.PlanForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JevoGastosUWP"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Width="240"
+    CornerRadius="4">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Dark.xaml" x:Key="Dark"/>
+                <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Light.xaml" x:Key="Light"/>
+            </ResourceDictionary.ThemeDictionaries>
+        </ResourceDictionary>
+    </Page.Resources>
+    <StackPanel CornerRadius="4" Background="{ThemeResource Brush_AppBackground1}">
+        <Border Background="{ThemeResource Brush_Accent2Background}">
+            <TextBlock x:Name="TB_Titulo" Text="Agregar plan" HorizontalAlignment="Stretch" TextAlignment="Center" Padding="4" Foreground="{ThemeResource Brush_Accent2Foreground}"/>
+        </Border>
+        <StackPanel Spacing="8" Padding="8">
+            <ComboBox x:Name="CB_TipoEtiqueta"
+                SelectionChanged="CB_TipoEtiqueta_SelectionChanged"
+                Header="Tipo etiqueta" 
+                HorizontalAlignment="Stretch" 
+                PlaceholderText="Seleccione una opción"/>
+            <ComboBox x:Name="CB_Etiqueta" 
+                      Header="Etiqueta" 
+                      HorizontalAlignment="Stretch" 
+                      PlaceholderText="Seleccione una opción"
+                      SelectionChanged="CB_Etiqueta_SelectionChanged"/>
+            <ComboBox x:Name="CB_TipoPlan" 
+                      Header="Tipo plan" 
+                      HorizontalAlignment="Stretch" 
+                      PlaceholderText="Seleccione una opción"
+                      SelectionChanged="CB_TipoPlan_SelectionChanged"/>
+            <ToggleSwitch x:Name="TS_EsMesFijo"
+                          OffContent="Día fijo"
+                          OnContent="Mes fijo"
+                          Toggled="TS_EsMesFijo_Toggled"
+                          Visibility="Collapsed"/>
+            <muxc:NumberBox x:Name="NB_Meta" 
+                            Header="Meta" 
+                            PlaceholderText="1+2^3" 
+                            AcceptsExpression="True" 
+                            HorizontalAlignment="Stretch"
+                            ValueChanged="NB_Meta_ValueChanged"
+                            KeyDown="NB_Meta_KeyDown"
+                            GettingFocus="NB_Meta_GettingFocus"/>
+            <Button x:Name="B_Agregar" 
+                    HorizontalAlignment="Right" 
+                    Background="DarkGreen" 
+                    Foreground="White"
+                    Click="B_Agregar_Click">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Enter"/>
+                </Button.KeyboardAccelerators>
+                <StackPanel 
+                    Orientation="Horizontal" 
+                    Spacing="4">
+                    <FontIcon 
+                        FontFamily="Segoe MDL2 Assets" 
+                        Glyph="&#xE73E;"/>
+                    <TextBlock 
+                        Text="Listo"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </StackPanel>
+</Page>

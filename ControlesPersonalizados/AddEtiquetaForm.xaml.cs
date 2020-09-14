@@ -1,6 +1,6 @@
 ﻿using JevoGastosCore;
+using JevoGastosCore.Enums;
 using JevoGastosCore.Model;
-using JevoGastosCore.ModelView.EtiquetaTypes;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Media;

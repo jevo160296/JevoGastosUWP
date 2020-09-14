@@ -1,9 +1,11 @@
 ﻿using JevoGastosCore;
+using JevoGastosCore.Enums;
 using JevoGastosCore.Model;
 using JevoGastosCore.ModelView;
-using JevoGastosCore.ModelView.EtiquetaTypes;
 using JevoGastosUWP.ControlesPersonalizados;
+using JevoGastosUWP.Forms;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Toolkit.Uwp.UI.Controls;
 using System;
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -14,6 +16,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
 using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Media.Animation;
 using Windows.UI.Xaml.Navigation;
 using muxc = Microsoft.UI.Xaml.Controls;
 
@@ -81,6 +84,7 @@ namespace JevoGastosUWP
         #endregion
         #region InternalVariables
         private ObservableCollection<Transaccion> relatedTrans = new ObservableCollection<Transaccion>();
+        private ObservableCollection<Plan> relatedPlanes = new ObservableCollection<Plan>();
 
         private GastosContainer Container;
         private ObservableCollection<Etiqueta> Etiquetas => Container.EtiquetaDAO.Items;
@@ -90,21 +94,23 @@ namespace JevoGastosUWP
         private ObservableCollection<Credito> Creditos => Container.CreditoDAO.Items;
         private ObservableCollection<Transaccion> Transacciones => Container.TransaccionDAO.Items;
         private ObservableCollection<Transaccion> RelatedTrans => relatedTrans;
+        private ObservableCollection<Plan> Planes => Container.PlanDAO.Items;
+        private ObservableCollection<Plan> RelatedPlanes => relatedPlanes;
         private VisibilityHandler ErrorVisibility = new VisibilityHandler();
         private VisibilityHandler TipoSelected = new VisibilityHandler();
         private VisibilityHandler TheresOrigenes = new VisibilityHandler();
         private VisibilityHandler TheresDestinos = new VisibilityHandler();
-        private VisibilityHandler EmptyRelated = new VisibilityHandler();
+        private VisibilityHandler EmptyRelatedTrans = new VisibilityHandler();
+        private VisibilityHandler EmptyRelatedPlans = new VisibilityHandler();
+        private VisibilityHandler RelatedTransMode = new VisibilityHandler();
         private VisibleBool PendentChanges = new VisibleBool(false);
-        private bool EditandoTrans = false;
         #endregion
-
         public MainPage()
         {
             this.InitializeComponent();
             Windows.UI.Core.Preview.SystemNavigationManagerPreview.GetForCurrentView().CloseRequested += MainPage_CloseRequested;
         }
-
+        #region Inicializacion
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
@@ -136,16 +142,6 @@ namespace JevoGastosUWP
         }
         private void ConfigureView()
         {
-            TipoSelected.PropertyChanged -= TipoSelected_PropertyChanged;
-            TipoSelected.PropertyChanged += TipoSelected_PropertyChanged;
-            Ingresos.CollectionChanged -= Etiquetas_CollectionChanged;
-            Cuentas.CollectionChanged -= Etiquetas_CollectionChanged;
-            Gastos.CollectionChanged -= Etiquetas_CollectionChanged;
-            Creditos.CollectionChanged -= Etiquetas_CollectionChanged;
-            Ingresos.CollectionChanged += Etiquetas_CollectionChanged;
-            Cuentas.CollectionChanged += Etiquetas_CollectionChanged;
-            Gastos.CollectionChanged += Etiquetas_CollectionChanged;
-            Creditos.CollectionChanged += Etiquetas_CollectionChanged;
             Container.Context.ChangeTracker.StateChanged -= ChangeTracker_StateChanged;
             Container.Context.ChangeTracker.StateChanged += ChangeTracker_StateChanged;
             Container.Context.ChangeTracker.Tracked -= ChangeTracker_Tracked;
@@ -153,10 +149,14 @@ namespace JevoGastosUWP
             PendentChanges.Value = Container.Context.ChangeTracker.HasChanges();
             Transacciones.CollectionChanged -= Transacciones_CollectionChanged;
             Transacciones.CollectionChanged += Transacciones_CollectionChanged;
+            Planes.CollectionChanged -= Planes_CollectionChanged;
+            Planes.CollectionChanged += Planes_CollectionChanged;
             RelatedTrans.CollectionChanged -= RelatedTrans_CollectionChanged;
             RelatedTrans.CollectionChanged += RelatedTrans_CollectionChanged;
+            RelatedPlanes.CollectionChanged -= RelatedPlanes_CollectionChanged;
+            RelatedPlanes.CollectionChanged += RelatedPlanes_CollectionChanged;
         }
-
+        #endregion
         #region ChangesTracker
         private void ChangeTracker_Tracked(object sender, Microsoft.EntityFrameworkCore.ChangeTracking.EntityTrackedEventArgs e)
         {
@@ -170,22 +170,7 @@ namespace JevoGastosUWP
             }
         }
 
-        private void TipoSelected_PropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if ((sender as VisibilityHandler).Visibility == Visibility.Collapsed)
-            {
-                SP_TransForm.Spacing = 0;
-            }
-            else
-            {
-                SP_TransForm.Spacing = 8;
-            }
-        }
-
-        private void Etiquetas_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
-        {
-            CheckOrigenesDestinos();
-        }
+        
         private void Transacciones_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
@@ -203,36 +188,33 @@ namespace JevoGastosUWP
                     break;
             }
         }
+        private void Planes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
+                    foreach (var item in e.OldItems)
+                    {
+                        RelatedPlanes.Remove((Plan)item);
+                    }
+                    break;
+                case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
+                    RelatedPlanes.Clear();
+                    break;
+                default:
+                    break;
+            }
+        }
         private void RelatedTrans_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-            if (RelatedTrans.Count == 0)
-            {
-                EmptyRelated.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                EmptyRelated.Visibility = Visibility.Collapsed;
-            }
-
+            EmptyRelatedTrans.Visibility = RelatedTrans.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        }
+        private void RelatedPlanes_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            EmptyRelatedPlans.Visibility = RelatedPlanes.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
         #endregion
         #region Adders
-        private void AddIngreso(string name)
-        {
-            Container.IngresoDAO.Add(name);
-        }
-        private void AddCuenta(string name)
-        {
-            Container.CuentaDAO.Add(name);
-        }
-        private void AddGasto(string name)
-        {
-            Container.GastoDAO.Add(name);
-        }
-        private void AddCredito(string name)
-        {
-            Container.CreditoDAO.Add(name);
-        }
         private void AddTransaccion(Etiqueta Origen, Etiqueta Destino, double valor, string descripcion = null, DateTime? dateTime = null)
         {
             if (!(Origen is null) & !(Destino is null))
@@ -320,83 +302,54 @@ namespace JevoGastosUWP
         }
         #endregion
         #region Click
-        private void AddIngreso_Click(object sender, RoutedEventArgs e)
+        private void AddPlan_Click(object sender, RoutedEventArgs e)
         {
-            try
-            {
-                AddIngreso(((AddEtiquetaForm)sender).TextBox.Text);
-                AEF_Ingreso.IsErrorRaised = false;
-            }
-            catch (Exception)
-            {
-                AEF_Ingreso.IsErrorRaised = true;
-            }
-        }
-        private void AddCuenta_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                AddCuenta(((AddEtiquetaForm)sender).TextBox.Text);
-                AEF_Cuenta.IsErrorRaised = false;
-            }
-            catch (Exception)
-            {
-                AEF_Cuenta.IsErrorRaised = true;
-            }
-        }
-        private void AddGasto_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                AddGasto(((AddEtiquetaForm)sender).TextBox.Text);
-                AEF_Gasto.IsErrorRaised = false;
-            }
-            catch (Exception)
-            {
-                AEF_Gasto.IsErrorRaised = true;
-            }
-        }
-        
-        private void AddCredito_Click(object sender, RoutedEventArgs e)
-        {
-            try
-            {
-                AddCredito(((AddEtiquetaForm)sender).TextBox.Text);
-                AEF_Credito.IsErrorRaised = false;
-            }
-            catch (Exception)
-            {
-                AEF_Credito.IsErrorRaised = true;
-            }
-        }
-        private void AddTransaccion_Click(object sender, RoutedEventArgs e)
-        {
-            double valor;
-            EditandoTrans = false;
-            if (!double.TryParse(TB_Valor.Text, out valor))
-            {
-                valor = 0;
-            }
-            Etiqueta origen = CB_Origen.SelectedItem as Etiqueta;
-            Etiqueta destino = CB_Destino.SelectedItem as Etiqueta;
-            string descripcion = TB_Descripcion.Text;
-            DateTime? date = CDP_Fecha.Date is null ? null : (DateTime?)CDP_Fecha.Date.Value.Date;
-            AddTransaccion(origen, destino, valor, descripcion, date);
-            CB_Origen.SelectedItem = origen;
-            CB_Destino.SelectedItem = destino;
-            TB_Descripcion.Text = "";
-            TB_Valor.Value = double.NaN;
-            TB_Valor.Focus(FocusState.Programmatic);
+            Frame_FlyoutAddPlan.Navigate(typeof(PlanForm), new PlanForm.Parameters(Container), new SuppressNavigationTransitionInfo());
         }
         private void Editar_Click(object sender, RoutedEventArgs e)
         {
-            Etiqueta etiqueta=(Etiqueta)(((MenuFlyoutItem)sender).CommandParameter);
-            AEF_EtiquetaEdit.Etiqueta = etiqueta;
-            AEF_EtiquetaEdit.TextBox.Text = etiqueta.Name;
-            AEF_EtiquetaEdit.TextBox.SelectAll();
-            ShowEtiquetaEditForm();
+            Etiqueta etiqueta = (Etiqueta)(((MenuFlyoutItem)sender).CommandParameter);
+            ShowEtiquetaEditForm(etiqueta);
         }
-        private void EditarTrans_Click(object sender, RoutedEventArgs e) { }
+        private void EditarTrans_Click(object sender, RoutedEventArgs e)
+        {
+            MenuFlyoutItem menuItem = (MenuFlyoutItem)sender;
+            ListViewItem row = (ListViewItem)menuItem.CommandParameter;
+            Transaccion transaccion = (Transaccion)row.Content;
+            FlyoutBase flyout = FlyoutBase.GetAttachedFlyout(G_Transacciones);
+            FlyoutShowOptions options = new FlyoutShowOptions()
+            {
+                Placement = FlyoutPlacementMode.Auto
+            };
+            flyout.ShowAt(row, options);
+            TransForm.Parameters parameters = new TransForm.Parameters(Container, true, transaccion);
+            Frame_EditTrans.Navigate(typeof(TransForm), parameters, new SuppressNavigationTransitionInfo());
+            ((TransForm)Frame_EditTrans.Content).CloseRequested += EditTransForm_CloseRequested;
+        }
+
+        private void EditTransForm_CloseRequested(TransForm.Parameters parameters)
+        {
+            FlyoutBase flyout = FlyoutBase.GetAttachedFlyout(G_Transacciones);
+            flyout.Hide();
+        }
+
+        private void EditarPlan_Click(object sender, RoutedEventArgs e)
+        {
+            DataGridRow dataGridRow = (DataGridRow)((MenuFlyoutItem)sender).CommandParameter;
+            Plan plan = (Plan)dataGridRow.DataContext;
+            FlyoutBase
+                .GetAttachedFlyout(DG_Planes)
+                .ShowAt(
+                dataGridRow,
+                new FlyoutShowOptions() { Placement = FlyoutPlacementMode.Auto });
+            Frame_EditPlan.Navigate(
+                typeof(PlanForm),
+                new PlanForm.Parameters(
+                    Container,
+                    plan,
+                    true),
+                new SuppressNavigationTransitionInfo());
+        }
         private async void Eliminar_Click(object sender, RoutedEventArgs e)
         {
             Etiqueta etiqueta = (Etiqueta)(((MenuFlyoutItem)sender).CommandParameter);
@@ -424,12 +377,13 @@ namespace JevoGastosUWP
         }
         private void Trans_Click(object sender, RoutedEventArgs e)
         {
+            RelatedTransMode.Visibility = Visibility.Visible;
             ListViewItem senderItem = (ListViewItem)((MenuFlyoutItem)sender).CommandParameter;
             Etiqueta senderEtiqueta = (Etiqueta)senderItem.Content;
             relatedTrans.Clear();
             foreach (Transaccion item in Transacciones)
             {
-                if (item.Origen==senderEtiqueta | item.Destino==senderEtiqueta)
+                if (item.Origen == senderEtiqueta | item.Destino == senderEtiqueta)
                 {
                     relatedTrans.Add(item);
                 }
@@ -443,67 +397,25 @@ namespace JevoGastosUWP
                 );
 
         }
-        private void AppBarCancelTransButton_Click(object sender, RoutedEventArgs e)
+        private void Plans_Click(object sender, RoutedEventArgs e)
         {
-            EditandoTrans = false;
-            var flyout = ABB_AddTrans.Flyout;
-            flyout.Hide();
-        }
-        private void B_Origen_Click(object sender, RoutedEventArgs e)
-        {
-            switch (CB_Tipo.SelectedIndex)
+            RelatedTransMode.Visibility = Visibility.Collapsed;
+            ListViewItem senderItem = (ListViewItem)((MenuFlyoutItem)sender).CommandParameter;
+            Etiqueta senderEtiqueta = (Etiqueta)senderItem.Content;
+            relatedPlanes.Clear();
+            foreach (Plan item in Planes)
             {
-                //Entrada
-                case 0:
-                    ShowIngresoForm();
-                    break;
-                //Movimiento
-                case 1:
-                    ShowCuentaForm();
-                    break;
-                //Salida
-                case 2:
-                    ShowCuentaForm();
-                    break;
-                //Prestamo
-                case 3:
-                    ShowCreditoForm();
-                    break;
-                //Pago
-                case 4:
-                    ShowCuentaForm();
-                    break;
-                default:
-                    break;
+                if (item.Etiqueta == senderEtiqueta)
+                {
+                    relatedPlanes.Add(item);
+                }
             }
-        }
-        private void B_Destino_Click(object sender, RoutedEventArgs e)
-        {
-            switch (CB_Tipo.SelectedIndex)
-            {
-                //Entrada
-                case 0:
-                    ShowCuentaForm();
-                    break;
-                //Movimiento
-                case 1:
-                    ShowCuentaForm();
-                    break;
-                //Salida
-                case 2:
-                    ShowGastoForm();
-                    break;
-                //Prestamo
-                case 3:
-                    ShowCuentaForm();
-                    break;
-                //Pago
-                case 4:
-                    ShowCreditoForm();
-                    break;
-                default:
-                    break;
-            }
+            FlyoutBase
+                .GetAttachedFlyout(G_BaseGrid)
+                .ShowAt
+                (senderItem,
+                new FlyoutShowOptions() { Placement = FlyoutPlacementMode.RightEdgeAlignedTop }
+                );
         }
         private void DIngreso_Click(object sender, RoutedEventArgs e)
         {
@@ -521,95 +433,30 @@ namespace JevoGastosUWP
         {
             DelTransaccion();
         }
+        private void ShowIngresoForm_Click(object sender, RoutedEventArgs e)
+        {
+            ShowIngresoForm();
+        }
+        private void ShowCuentaForm_Click(object sender, RoutedEventArgs e)
+        {
+            ShowCuentaForm();
+        }
+        private void ShowGastoForm_Click(object sender, RoutedEventArgs e)
+        {
+            ShowGastoForm();
+        }
+        private void ShowCreditoForm_Click(object sender, RoutedEventArgs e)
+        {
+            ShowEtiquetaAddForm(TipoEtiqueta.Credito);
+        }
         #endregion
-        private void ResetTransaccionForm()
-        {
-            CDP_Fecha.Date = DateTime.Now;
-            CB_Origen.SelectedIndex = -1;
-            CB_Destino.SelectedIndex = -1;
-            TB_Valor.Text = "";
-            TB_Descripcion.Text = "";
-        }
-        private void CB_TipoSelected(object sender, SelectionChangedEventArgs e)
-        {
-            ComboBox cb = (ComboBox)sender;
-            int index = cb.SelectedIndex;
-            if (index == -1)
-            {
-                TipoSelected.Visibility = Visibility.Collapsed;
-            }
-            else
-            {
-                if (TipoSelected.Visibility == Visibility.Collapsed)
-                {
-                    ResetTransaccionForm();
-                    TransFormDataValidation();
-                }
-                EditandoTrans = true;
-                TipoSelected.Visibility = Visibility.Visible;
-                switch (index)
-                {
-                    //Entrada
-                    case 0:
-                        CB_Origen.ItemsSource = Ingresos;
-                        CB_Destino.ItemsSource = Cuentas;
-                        CB_Origen.PlaceholderText = "Ingresos";
-                        CB_Destino.PlaceholderText = "Cuentas";
-                        B_Origen.Content = "Nuevo Ingreso";
-                        B_Destino.Content = "Nueva Cuenta";
-                        break;
-                    //Movimiento
-                    case 1:
-                        CB_Origen.ItemsSource = Cuentas;
-                        CB_Destino.ItemsSource = Cuentas;
-                        CB_Origen.PlaceholderText = "Cuentas";
-                        CB_Destino.PlaceholderText = "Cuentas";
-                        B_Origen.Content = "Nueva Cuenta";
-                        B_Destino.Content = "Nueva Cuenta";
-                        break;
-                    //Salida
-                    case 2:
-                        CB_Origen.ItemsSource = Cuentas;
-                        CB_Destino.ItemsSource = Gastos;
-                        CB_Origen.PlaceholderText = "Cuentas";
-                        CB_Destino.PlaceholderText = "Gastos";
-                        B_Origen.Content = "Nueva Cuenta";
-                        B_Destino.Content = "Nuevo Gasto";
-                        break;
-                    //Prestamo
-                    case 3:
-                        CB_Origen.ItemsSource = Creditos;
-                        CB_Destino.ItemsSource = Cuentas;
-                        CB_Origen.PlaceholderText = "Creditos";
-                        CB_Destino.PlaceholderText = "Cuentas";
-                        B_Origen.Content = "Nuevo credito";
-                        B_Destino.Content = "Nueva cuenta";
-                        break;
-                    //Pago
-                    case 4:
-                        CB_Origen.ItemsSource = Cuentas;
-                        CB_Destino.ItemsSource = Creditos;
-                        CB_Origen.PlaceholderText = "Cuentas";
-                        CB_Destino.PlaceholderText = "Creditos";
-                        B_Origen.Content = "Nueva cuenta";
-                        B_Destino.Content = "Nuevo credito";
-                        break;
-                    default:
-                        break;
-                }
-                CheckOrigenesDestinos();
-            }
-        }
-        private void CheckOrigenesDestinos()
-        {
-            TheresOrigenes.Visibility = (CB_Origen.Items.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
-            TheresDestinos.Visibility = (CB_Destino.Items.Count > 0) ? Visibility.Visible : Visibility.Collapsed;
-        }
+        #region Otros
         private void LV_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             var deleteCommand = new StandardUICommand(StandardUICommandKind.None);
             var editCommand = new StandardUICommand(StandardUICommandKind.None);
             var transCommand = new StandardUICommand(StandardUICommandKind.None);
+            var plansCommand = new StandardUICommand(StandardUICommandKind.None);
             Etiqueta data = args.Item as Etiqueta;
             MenuFlyout menuFlyout = new MenuFlyout();
             MenuFlyoutItem eliminar = new MenuFlyoutItem()
@@ -634,16 +481,24 @@ namespace JevoGastosUWP
                 Command = transCommand,
                 CommandParameter = args.ItemContainer as ListViewItem
             };
+            MenuFlyoutItem plans = new MenuFlyoutItem()
+            {
+                Text = "Planes",
+                Icon = new SymbolIcon(Symbol.Flag),
+                Command = plansCommand,
+                CommandParameter = args.ItemContainer as ListViewItem
+            };
             eliminar.Click += Eliminar_Click;
             editar.Click += Editar_Click;
             trans.Click += Trans_Click;
+            plans.Click += Plans_Click;
             menuFlyout.Items.Add(editar);
             menuFlyout.Items.Add(eliminar);
             menuFlyout.Items.Add(sep);
             menuFlyout.Items.Add(trans);
+            menuFlyout.Items.Add(plans);
             args.ItemContainer.ContextFlyout = menuFlyout;
         }
-
         private void LV_Transacciones_ContainerContentChanging(ListViewBase sender, ContainerContentChangingEventArgs args)
         {
             var deleteCommand = new StandardUICommand(StandardUICommandKind.None);
@@ -662,7 +517,7 @@ namespace JevoGastosUWP
                 Text = "Editar",
                 Icon = new SymbolIcon(Symbol.Edit),
                 Command = editCommand,
-                CommandParameter = data
+                CommandParameter = args.ItemContainer
             };
             eliminar.Click += EliminarTrans_Click;
             editar.Click += EditarTrans_Click;
@@ -672,97 +527,48 @@ namespace JevoGastosUWP
         }
         private void AddTransFlyout_Closing(Windows.UI.Xaml.Controls.Primitives.FlyoutBase sender, Windows.UI.Xaml.Controls.Primitives.FlyoutBaseClosingEventArgs args)
         {
-            if (!EditandoTrans)
-            {
-                CB_Tipo.SelectedIndex = -1;
-            }
-        }
-        private bool TransFormDataValidation()
-        {
-            bool
-                fechaC,
-                origenC,
-                destinoC,
-                valorC,
-                correcto;
-            fechaC = !(CDP_Fecha.Date is null);
-            origenC = CB_Origen.SelectedIndex != -1;
-            destinoC = CB_Destino.SelectedIndex != -1;
-            valorC = !(TB_Valor.Value is double.NaN);
-            correcto =
-                 fechaC &
-                 origenC &
-                 destinoC &
-                 valorC
-                ;
-            APB_GuardarTrans.IsEnabled = correcto;
-            return correcto;
-        }
-        private void CDP_Fecha_DateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
-        {
-            TransFormDataValidation();
-        }
-        private void CB_Origen_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            TransFormDataValidation();
-        }
-        private void TB_Valor_ValueChanged(muxc.NumberBox sender, muxc.NumberBoxValueChangedEventArgs args)
-        {
-            TransFormDataValidation();
-        }
-        private void ShowIngresoForm_Click(object sender, RoutedEventArgs e)
-        {
-            ShowIngresoForm();
-        }
-        private void ShowCuentaForm_Click(object sender, RoutedEventArgs e)
-        {
-            ShowCuentaForm();
-        }
-        private void ShowGastoForm_Click(object sender, RoutedEventArgs e)
-        {
-            ShowGastoForm();
-        }
-        private void ShowCreditoForm_Click(object sender, RoutedEventArgs e)
-        {
-            ShowCreditoForm();
         }
         private void ShowIngresoForm()
         {
-            ResetPopups();
-            Popup_IngresoForm.IsOpen = true;
-            AEF_Ingreso.Focus(FocusState.Programmatic);
+            ShowEtiquetaAddForm(TipoEtiqueta.Ingreso);
         }
         private void ShowCuentaForm()
         {
-            ResetPopups();
-            Popup_CuentaForm.IsOpen = true;
-            AEF_Cuenta.Focus(FocusState.Programmatic);
+            ShowEtiquetaAddForm(TipoEtiqueta.Cuenta);
         }
         private void ShowGastoForm()
         {
-            ResetPopups();
-            Popup_GastoForm.IsOpen = true;
-            AEF_Gasto.Focus(FocusState.Programmatic);
+            ShowEtiquetaAddForm(TipoEtiqueta.Gasto);
         }
-        private void ShowCreditoForm()
+        private void ShowEtiquetaAddForm(TipoEtiqueta tipoEtiqueta)
         {
             ResetPopups();
-            Popup_CreditoForm.IsOpen = true;
-            AEF_Credito.Focus(FocusState.Programmatic);
+            EtiquetaForm.Parameters parameters = new EtiquetaForm.Parameters(Container,tipoEtiqueta:tipoEtiqueta);
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(
+                typeof(EtiquetaForm),
+                parameters, new SuppressNavigationTransitionInfo());
         }
-        private void ShowEtiquetaEditForm()
+        private void ShowEtiquetaEditForm(Etiqueta etiqueta)
         {
             ResetPopups();
-            Popup_EtiquetaEditForm.IsOpen = true;
-            AEF_EtiquetaEdit.Focus(FocusState.Programmatic);
+            EtiquetaForm.Parameters parameters =
+                new EtiquetaForm.Parameters(Container, etiqueta, isEditMode: true);
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(
+                typeof(EtiquetaForm),
+                parameters, new SuppressNavigationTransitionInfo());
+            ((EtiquetaForm)Frame_MultiUse.Content).CloseRequested += EtiquetaForm_CloseRequested;
         }
+
+        private void EtiquetaForm_CloseRequested()
+        {
+            Popup_MultiUse.IsOpen = false;
+        }
+
         private void ResetPopups()
         {
-            Popup_IngresoForm.IsOpen = false;
-            Popup_CuentaForm.IsOpen = false;
-            Popup_GastoForm.IsOpen = false;
-            Popup_CreditoForm.IsOpen = false;
-            Popup_EtiquetaEditForm.IsOpen = false;
+            Popup_MultiUse.IsOpen = false;
         }
 
         private async void ABB_Guardar_Click(object sender, RoutedEventArgs e)
@@ -787,12 +593,6 @@ namespace JevoGastosUWP
             return respuesta;
         }
 
-        private void EditEtiqueta_Click(object sender, RoutedEventArgs e)
-        {
-            AEF_EtiquetaEdit.Etiqueta.Name = AEF_EtiquetaEdit.TextBox.Text;
-            Popup_EtiquetaEditForm.IsOpen = false;
-        }
-
         private async void ClearIngresos_Click(object sender, RoutedEventArgs e)
         {
             await ClearEtiquetas(TipoEtiqueta.Ingreso, "¿Desea eliminar todas las fuentes de ingreso?");
@@ -814,9 +614,17 @@ namespace JevoGastosUWP
         {
             await ClearTrans(Transacciones, "¿Desea eliminar todas las transacciones?");
         }
+        private async void ClearPlanes_Click(object sender, RoutedEventArgs e)
+        {
+            await ClearPlanes(Planes, "¿Desea eliminar todos los planes?");
+        }
         private async void ClearRelaTrans_Click(object sender, RoutedEventArgs e)
         {
             await ClearRelaTrans(RelatedTrans, "¿Desea eliminar todas las transacciones relacionadas?");
+        }
+        private async void ClearRelaPlans_Click(object sender, RoutedEventArgs e)
+        {
+            await ClearRelaPlans(RelatedPlanes, "¿Desea eliminar todos los planes relacionados?");
         }
         private async Task ClearRelaTrans(IList list, string confirmationtext = null)
         {
@@ -839,12 +647,33 @@ namespace JevoGastosUWP
             Container.TransaccionDAO.Remove(RelatedTrans);
             RelatedTrans.Clear();
         }
-        private async Task ClearTrans(IList list,string confirmationtext=null)
+        private async Task ClearRelaPlans(IList list, string confirmationtext = null)
         {
-            if (!(confirmationtext is null) || confirmationtext.Length>0)
+            if (!(confirmationtext is null) || confirmationtext.Length > 0)
             {
                 CD_Clear.Content = confirmationtext;
-                ContentDialogResult response =await CD_Clear.ShowAsync();
+                ContentDialogResult response = await CD_Clear.ShowAsync();
+                switch (response)
+                {
+                    case ContentDialogResult.None:
+                        break;
+                    case ContentDialogResult.Primary:
+                        break;
+                    case ContentDialogResult.Secondary:
+                        return;
+                    default:
+                        break;
+                }
+            }
+            Container.PlanDAO.Remove(RelatedPlanes);
+            RelatedPlanes.Clear();
+        }
+        private async Task ClearTrans(IList list, string confirmationtext = null)
+        {
+            if (!(confirmationtext is null) || confirmationtext.Length > 0)
+            {
+                CD_Clear.Content = confirmationtext;
+                ContentDialogResult response = await CD_Clear.ShowAsync();
                 switch (response)
                 {
                     case ContentDialogResult.None:
@@ -859,7 +688,27 @@ namespace JevoGastosUWP
             }
             Container.TransaccionDAO.Clear();
         }
-        private async Task ClearEtiquetas(TipoEtiqueta tipo,string confirmationtext=null)
+        private async Task ClearPlanes(IList list, string confirmationtext = null)
+        {
+            if (!(confirmationtext is null) || confirmationtext.Length > 0)
+            {
+                CD_Clear.Content = confirmationtext;
+                ContentDialogResult response = await CD_Clear.ShowAsync();
+                switch (response)
+                {
+                    case ContentDialogResult.None:
+                        break;
+                    case ContentDialogResult.Primary:
+                        break;
+                    case ContentDialogResult.Secondary:
+                        return;
+                    default:
+                        break;
+                }
+            }
+            Container.PlanDAO.Clear();
+        }
+        private async Task ClearEtiquetas(TipoEtiqueta tipo, string confirmationtext = null)
         {
             if (!(confirmationtext is null) || confirmationtext.Length > 0)
             {
@@ -878,6 +727,65 @@ namespace JevoGastosUWP
                 }
                 EtiquetaDAO.Clear(tipo, Container);
             }
+        }
+
+        private void DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
+        {
+            var deleteCommand = new StandardUICommand(StandardUICommandKind.None);
+            var editCommand = new StandardUICommand(StandardUICommandKind.None);
+
+            Plan data = e.Row.DataContext as Plan;
+            MenuFlyout menuFlyout = new MenuFlyout();
+            MenuFlyoutItem eliminar = new MenuFlyoutItem()
+            {
+                Text = "Eliminar",
+                Icon = new SymbolIcon(Symbol.Delete),
+                Command = deleteCommand,
+                CommandParameter = data
+            };
+            MenuFlyoutItem editar = new MenuFlyoutItem()
+            {
+                Text = "Editar",
+                Icon = new SymbolIcon(Symbol.Edit),
+                Command = editCommand,
+                CommandParameter = e.Row,
+            };
+            eliminar.Click += EliminarPlan_Click;
+            editar.Click += EditarPlan_Click;
+            menuFlyout.Items.Add(editar);
+            menuFlyout.Items.Add(eliminar);
+
+            e.Row.ContextFlyout = menuFlyout;
+        }
+
+        private void EliminarPlan_Click(object sender, RoutedEventArgs e)
+        {
+            Planes.Remove(((MenuFlyoutItem)sender).CommandParameter as Plan);
+        }
+
+        private void ConfiguracionButton_Click(object sender, RoutedEventArgs e)
+        {
+            ResetPopups();
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(
+                typeof(SettingsPage),
+                new SettingsPage.Parameters(Container.PayDaysDAO),
+                new SuppressNavigationTransitionInfo());
+        }
+        #endregion
+        private void AddTrans_Click(object sender, RoutedEventArgs e)
+        {
+            TransForm.Parameters parameters = new TransForm.Parameters(Container);
+            if (Frame_AddTransaction.Content is null)
+            { 
+                Frame_AddTransaction.Navigate(typeof(TransForm), parameters, new SuppressNavigationTransitionInfo());
+                ((TransForm)Frame_AddTransaction.Content).CloseRequested += AddTransacctionForm_CloseRequested;
+            }
+        }
+
+        private void AddTransacctionForm_CloseRequested(TransForm.Parameters e)
+        {
+            ABB_AddTrans.Flyout.Hide();
         }
     }
 }

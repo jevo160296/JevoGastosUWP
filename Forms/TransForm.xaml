@@ -1,0 +1,75 @@
+﻿<Page
+    x:Class="JevoGastosUWP.Forms.TransForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JevoGastosUWP.Forms"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    xmlns:converters="using:JevoGastosUWP.Converters"
+    LostFocus="Page_LostFocus">
+    <Page.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Dark.xaml" x:Key="Dark"/>
+                <ResourceDictionary Source="/ResourceDictionaries/MainPageDictionaries/Light.xaml" x:Key="Light"/>
+            </ResourceDictionary.ThemeDictionaries>
+            <converters:NotGate x:Key="notgate"/>
+        </ResourceDictionary>
+    </Page.Resources>
+    <StackPanel x:Name="SP_AddTransaccion" Width="{StaticResource FlyoutThemeTouchMinWidth}" CornerRadius="4">
+        <Border Background="{ThemeResource Brush_Accent2Background}" Padding="8">
+            <TextBlock x:Uid="nuevatransaccion" x:Name="TB_Title" Foreground="{ThemeResource Brush_Accent2Foreground}" Text="Nueva transacción" TextAlignment="Center"/>
+        </Border>
+        <StackPanel x:Name="SP_TransForm" Margin="8">
+            <FlyoutBase.AttachedFlyout>
+                <Flyout>
+                    <Frame x:Name="Frame_EtiquetaForm"/>
+                </Flyout>
+            </FlyoutBase.AttachedFlyout>
+            <ComboBox x:Name="CB_Tipo" x:Uid="CB_tipo" Header="Tipo" HorizontalAlignment="Stretch" SelectionChanged="CB_TipoSelected" PlaceholderText="Seleccionar tipo"/>
+            <CalendarDatePicker x:Name="CDP_Fecha" Header="Fecha" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" DateChanged="CDP_Fecha_DateChanged"/>
+            <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Origen" HorizontalAlignment="Stretch"/>
+                    <ComboBox x:Name="CB_Origen" HorizontalAlignment="Stretch" SelectionChanged="CB_Origen_SelectionChanged" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay}"/>
+                    <Button x:Name="B_Origen" Click="B_Origen_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
+                </StackPanel>
+            </Grid>
+            <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
+                <StackPanel Spacing="4">
+                    <TextBlock Text="Destino" HorizontalAlignment="Stretch"/>
+                    <ComboBox x:Name="CB_Destino" HorizontalAlignment="Stretch" SelectionChanged="CB_Origen_SelectionChanged" Visibility="{x:Bind TheresDestinos.Visibility,Mode=OneWay}"/>
+                    <Button x:Name="B_Destino" Click="B_Destino_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresDestinos.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
+                </StackPanel>
+            </Grid>
+            <muxc:NumberBox 
+                x:Name="TB_Valor" 
+                Header="Valor" 
+                PlaceholderText="1+2^2"
+                AcceptsExpression="True"
+                ValidationMode="InvalidInputOverwritten"
+                ValueChanged="TB_Valor_ValueChanged"
+                HorizontalAlignment="Stretch" 
+                Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}"
+                GotFocus="TB_Valor_GotFocus"
+                LostFocus="TB_Valor_LostFocus"
+                KeyDown="TB_Valor_KeyDown"/>
+            <TextBox x:Name="TB_Descripcion" Header="Descripción" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" PlaceholderText="Descripción"/>
+        </StackPanel>
+        <CommandBar DefaultLabelPosition="Right" AllowFocusOnInteraction="True">
+            <AppBarButton x:Uid="guardar" x:Name="APB_GuardarTrans" AllowFocusOnInteraction="True" Label="Listo" Icon="Accept" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SP_AddTransaccion}"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+            <AppBarButton x:Uid="cancelar" Label="Cancelar" Icon="Cancel" Click="AppBarCancelTransButton_Click">
+                <AppBarButton.KeyboardAccelerators>
+                    <KeyboardAccelerator Key="Escape" ScopeOwner="{x:Bind SP_AddTransaccion}"/>
+                </AppBarButton.KeyboardAccelerators>
+            </AppBarButton>
+        </CommandBar>
+    </StackPanel>
+</Page>

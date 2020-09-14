@@ -6,6 +6,7 @@
     xmlns:PScontrols="using:JevoGastosUWP.ControlesPersonalizados"
     xmlns:core="using:JevoGastosCore.Model"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    xmlns:tkit="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:lottie="using:Microsoft.Toolkit.Uwp.UI.Lottie"
     xmlns:converters="using:JevoGastosUWP.Converters" 
     xmlns:aux="using:JevoGastosUWP.Auxiliares"
@@ -22,6 +23,9 @@
             <converters:DoubleToCurrency x:Key="doubletocurrency"/>
             <converters:NotGate x:Key="notgate"/>
             <converters:DateToString x:Key="datetostring"/>
+            <converters:NullTo0 x:Key="nullto0"/>
+            <converters:EtiquetaToTypeName x:Key="etiquetaToTypeName"/>
+            <converters:DatePrefix x:Key="datePrefix"/>
             <Style TargetType="ListViewItem" x:Key="ContentStretched_Items">
                 <Setter Property="Template">
                     <Setter.Value>
@@ -140,17 +144,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <Style x:Key="EtiquetaFormStyle" TargetType="PScontrols:AddEtiquetaForm">
-                <Setter Property="HeaderBackground" Value="{ThemeResource Brush_Accent2Background}"/>
-                <Setter Property="HeaderForeground" Value="{ThemeResource Brush_Accent2Foreground}"/>
-                <Setter Property="Width" Value="{StaticResource	FlyoutThemeTouchMinWidth}"/>
-                <Setter Property="Container" Value="{x:Bind Container}"/>
-                <Setter Property="ErrorText" Value="El nombre ya existe."/>
-                <Setter Property="Background" Value="{ThemeResource AppBarBackgroundThemeBrush}"/>
-                <Setter Property="BorderBrush" Value="{ThemeResource Brush_PopupBorder}"/>
-                <Setter Property="BorderThickness" Value="{ThemeResource Thickness_PopupThickness}"/>
-                <Setter Property="Label" Value="Listo"/>
-            </Style>
             <Style TargetType="ListView" x:Key="ListViewBasic">
                 <Setter Property="ItemContainerStyle" Value="{StaticResource ContentStretched_Items}"/>
                 <Setter Property="SelectionMode" Value="None"/>
@@ -245,19 +238,22 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <FlyoutBase.AttachedFlyout>
-            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}"
+                    LightDismissOverlayMode="Off"
+                    ShowMode="Standard">
                 <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="1*"/>
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones relacionadas" Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
-                    <Button Style="{StaticResource StyleClearButton}" Click="ClearRelaTrans_Click" Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}" Grid.Column="1"/>
-                    <ListView
+                    <Grid Visibility="{x:Bind RelatedTransMode.Visibility,Mode=OneWay}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones relacionadas" Visibility="{x:Bind EmptyRelatedTrans.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearRelaTrans_Click" Visibility="{x:Bind EmptyRelatedTrans.Visibility,Converter={StaticResource notgate},Mode=OneWay}" Grid.Column="1"/>
+                        <ListView
                         x:Name="LV_RelatedTrans"
                         ItemsSource="{x:Bind RelatedTrans}"
                         ContainerContentChanging="LV_Transacciones_ContainerContentChanging"
@@ -267,49 +263,110 @@
                         ItemTemplate="{StaticResource TransaccionesTinyTemplate}"
                         Grid.ColumnSpan="2"
                         Grid.Row="1"
-                        Visibility="{x:Bind EmptyRelated.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
-                    <muxc:AnimatedVisualPlayer x:Name="EmptyEtiquetasLottie" Width="80" Height="80" Margin="80 80 80 0" Visibility="{x:Bind EmptyRelated.Visibility,Mode=OneWay}">
-                        <lottie:LottieVisualSource x:Name="LottieEmptyEtiquetas" UriSource="ms-appx:///Lottie/Empty.json"/>
-                    </muxc:AnimatedVisualPlayer>
-                    <TextBlock Text="Vacío" HorizontalAlignment="Center" Padding="0 2 0 2" Visibility="{x:Bind EmptyRelated.Visibility,Mode=OneWay}" Margin="80 8 80 80" Grid.Row="1"/>
+                        Visibility="{x:Bind EmptyRelatedTrans.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
+                        <muxc:AnimatedVisualPlayer x:Name="EmptyEtiquetasLottie" Width="80" Height="80" Margin="80 80 80 0" Visibility="{x:Bind EmptyRelatedTrans.Visibility,Mode=OneWay}">
+                            <lottie:LottieVisualSource x:Name="LottieEmptyEtiquetas" UriSource="ms-appx:///Lottie/Empty.json"/>
+                        </muxc:AnimatedVisualPlayer>
+                        <TextBlock Text="Vacío" HorizontalAlignment="Center" Padding="0 2 0 2" Visibility="{x:Bind EmptyRelatedTrans.Visibility,Mode=OneWay}" Margin="80 8 80 80" Grid.Row="1"/>
+                    </Grid>
+                    <Grid Visibility="{x:Bind RelatedTransMode.Visibility,Mode=OneWay,Converter={StaticResource notgate}}" Width="240">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="1*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Planes relacionados" Visibility="{x:Bind EmptyRelatedPlans.Visibility,Converter={StaticResource notgate},Mode=OneWay}"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearRelaPlans_Click" Visibility="{x:Bind EmptyRelatedPlans.Visibility,Converter={StaticResource notgate},Mode=OneWay}" Grid.Column="1"/>
+                        <tkit:DataGrid x:Name="DG_Planes"
+                                       ItemsSource="{x:Bind RelatedPlanes}" 
+                                       AutoGenerateColumns="False" 
+                                       Grid.Row="1" 
+                                       Grid.ColumnSpan="2"
+                                       LoadingRow="DataGrid_LoadingRow"
+                                       Visibility="{x:Bind EmptyRelatedPlans.Visibility,Converter={StaticResource notgate},Mode=OneWay}"
+                                       >
+                            <FlyoutBase.AttachedFlyout>
+                                <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+                                    <Frame x:Name="Frame_EditPlan"/>
+                                </Flyout>
+                            </FlyoutBase.AttachedFlyout>
+                            <tkit:DataGrid.Columns>
+                                <tkit:DataGridTemplateColumn Header="Etiqueta" Width="1*">
+                                    <tkit:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="core:Plan">
+                                            <TextBlock Text="{x:Bind Etiqueta.Name,Mode=OneWay}" TextAlignment="Center"/>
+                                        </DataTemplate>
+                                    </tkit:DataGridTemplateColumn.CellTemplate>
+                                </tkit:DataGridTemplateColumn>
+                                <tkit:DataGridTemplateColumn Header="Tipo" Width="1*">
+                                    <tkit:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="core:Plan">
+                                            <TextBlock Text="{x:Bind Tipo,Mode=OneWay}" TextAlignment="Center"/>
+                                        </DataTemplate>
+                                    </tkit:DataGridTemplateColumn.CellTemplate>
+                                </tkit:DataGridTemplateColumn>
+                                <tkit:DataGridTemplateColumn Header="Meta" Width="1*">
+                                    <tkit:DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate x:DataType="core:Plan">
+                                            <TextBlock Text="{x:Bind Meta,Mode=OneWay,Converter={StaticResource doubletocurrency}}" TextAlignment="Center"/>
+                                        </DataTemplate>
+                                    </tkit:DataGridTemplateColumn.CellTemplate>
+                                    <tkit:DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate x:DataType="core:Plan">
+                                            <muxc:NumberBox Value="{x:Bind Meta,Mode=TwoWay,Converter={StaticResource nullto0}}"/>
+                                        </DataTemplate>
+                                    </tkit:DataGridTemplateColumn.CellEditingTemplate>
+                                </tkit:DataGridTemplateColumn>
+                            </tkit:DataGrid.Columns>
+                        </tkit:DataGrid>
+                        <muxc:AnimatedVisualPlayer x:Name="EmptyPlansLottie" Width="80" Height="80" Margin="80 80 80 0" Visibility="{x:Bind EmptyRelatedPlans.Visibility,Mode=OneWay}">
+                            <lottie:LottieVisualSource x:Name="LottieEmptyPlans" UriSource="ms-appx:///Lottie/Empty.json"/>
+                        </muxc:AnimatedVisualPlayer>
+                        <TextBlock Text="Vacío" HorizontalAlignment="Center" Padding="0 2 0 2" Visibility="{x:Bind EmptyRelatedPlans.Visibility,Mode=OneWay}" Margin="80 8 80 80" Grid.Row="1"/>
+                    </Grid>
                 </Grid>
             </Flyout>
         </FlyoutBase.AttachedFlyout>
         <!--#endregion-->
-        <Grid
+        <Pivot>
+            <PivotItem Header="Transacciones">
+                <Grid
             Grid.Row="0"
             ColumnSpacing="8"
             RowSpacing="4"
             Margin="16 16 16 4"
             >
-            <!--#region Congiguración-->
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition MaxWidth="256"/>
-                <ColumnDefinition MaxWidth="256"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition/>
-                <RowDefinition/>
-            </Grid.RowDefinitions>
-            <!--#endregion-->
-            <Grid
+                    <!--#region Congiguración-->
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition MaxWidth="256"/>
+                        <ColumnDefinition MaxWidth="256"/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition/>
+                        <RowDefinition/>
+                    </Grid.RowDefinitions>
+                    <!--#endregion-->
+                    <Grid
                 Grid.Row="0"
                 Grid.Column="0"
                 >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Uid="ingresos" ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
-                <Button Style="{StaticResource StyleAddButton}" Click="ShowIngresoForm_Click"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearIngresos_Click"/>
-                <ListView 
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter x:Uid="ingresos" ContentTemplate="{StaticResource ListTemplate}" Content="Ingresos"/>
+                        <Button Style="{StaticResource StyleAddButton}" Click="ShowIngresoForm_Click"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearIngresos_Click"/>
+                        <ListView 
                     x:Name="LV_Ingresos"
                     Grid.Row="1"
                     Grid.ColumnSpan="3"
@@ -318,24 +375,24 @@
                     ContainerContentChanging="LV_ContainerContentChanging"
                     Style="{StaticResource ListViewBasic}"
                     />
-            </Grid>
-            <Grid
+                    </Grid>
+                    <Grid
                 Grid.Row="0"
                 Grid.Column="1"
                 >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
-                <Button Style="{StaticResource StyleAddButton}" Click="ShowCuentaForm_Click"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearCuentas_Click"/>
-                <ListView
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter x:Uid="cuentas" ContentTemplate="{StaticResource ListTemplate}" Content="Cuentas"/>
+                        <Button Style="{StaticResource StyleAddButton}" Click="ShowCuentaForm_Click"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearCuentas_Click"/>
+                        <ListView
                     x:Name="LV_Cuentas"
                     ItemsSource="{x:Bind Cuentas}"
                     Grid.Row="1"
@@ -343,24 +400,24 @@
                     ItemTemplate="{StaticResource EtiquetaTemplate}"
                     ContainerContentChanging="LV_ContainerContentChanging"
                     Style="{StaticResource ListViewBasic}"/>
-            </Grid>
-            <Grid
+                    </Grid>
+                    <Grid
                 Grid.Row="1"
                 Grid.Column="0"
                 >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Uid="gastos" ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
-                <Button Style="{StaticResource StyleAddButton}" Click="ShowGastoForm_Click"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearGastos_Click"/>
-                <ListView
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter x:Uid="gastos" ContentTemplate="{StaticResource ListTemplate}" Content="Gastos"/>
+                        <Button Style="{StaticResource StyleAddButton}" Click="ShowGastoForm_Click"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearGastos_Click"/>
+                        <ListView
                     x:Name="LV_Gastos"
                     Grid.Row="1"
                     Grid.ColumnSpan="3"
@@ -369,24 +426,24 @@
                     ContainerContentChanging="LV_ContainerContentChanging"
                     Style="{StaticResource ListViewBasic}"
                 />
-            </Grid>
-            <Grid
+                    </Grid>
+                    <Grid
                 Grid.Row="1"
                 Grid.Column="1"
                 >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter x:Uid="creditos" ContentTemplate="{StaticResource ListTemplate}" Content="Creditos"/>
-                <Button Style="{StaticResource StyleAddButton}" Click="ShowCreditoForm_Click"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearCreditos_Click"/>
-                <ListView
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <ContentPresenter x:Uid="creditos" ContentTemplate="{StaticResource ListTemplate}" Content="Creditos"/>
+                        <Button Style="{StaticResource StyleAddButton}" Click="ShowCreditoForm_Click"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearCreditos_Click"/>
+                        <ListView
                     x:Name="LV_Creditos"
                     Grid.Row="1"
                     Grid.ColumnSpan="3"
@@ -395,22 +452,28 @@
                     ContainerContentChanging="LV_ContainerContentChanging"
                     Style="{StaticResource ListViewBasic}"
                 />
-            </Grid>
-            <Grid
-                Grid.Column="2"
-                Grid.RowSpan="2"
-                >
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="1*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-                <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones"/>
-                <Button Style="{StaticResource StyleClearButton}" Click="ClearTransacciones_Click"/>
-                <ListView
+                    </Grid>
+                    <Grid
+                        x:Name="G_Transacciones"
+                        Grid.Column="2"
+                        Grid.RowSpan="2"
+                        >
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <FlyoutBase.AttachedFlyout>
+                            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+                                <Frame x:Name="Frame_EditTrans"/>
+                            </Flyout>
+                        </FlyoutBase.AttachedFlyout>
+                        <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones"/>
+                        <Button Style="{StaticResource StyleClearButton}" Click="ClearTransacciones_Click"/>
+                        <ListView
                     x:Name="LV_Transacciones"
                     Grid.Row="1"
                     Grid.ColumnSpan="2"
@@ -418,8 +481,95 @@
                     ItemTemplate="{StaticResource TransaccionesLargeTemplate}"
                     ContainerContentChanging="LV_Transacciones_ContainerContentChanging"
                     Style="{StaticResource ListViewBasic}"/>
-            </Grid>
-        </Grid>
+                    </Grid>
+                </Grid>
+            </PivotItem>
+            <PivotItem Header="Plan">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="1*"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="1*"/>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Planes"/>
+                    <Button x:Name="B_AddPlan" Style="{StaticResource StyleAddButton}" Grid.Column="1" Click="AddPlan_Click">
+                        <Button.Flyout>
+                            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+                                <Frame x:Name="Frame_FlyoutAddPlan"/>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
+                    <Button Style="{StaticResource StyleClearButton}" Click="ClearPlanes_Click"  Grid.Column="2"/>
+                    <tkit:DataGrid
+                        ItemsSource="{x:Bind Planes}" 
+                        AutoGenerateColumns="False" 
+                        Grid.Row="1" 
+                        Grid.ColumnSpan="3"
+                        LoadingRow="DataGrid_LoadingRow">
+                        <FlyoutBase.AttachedFlyout>
+                            <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
+                                <Frame x:Name="Frame_EditRelatedPlan"/>
+                            </Flyout>
+                        </FlyoutBase.AttachedFlyout>
+                        <tkit:DataGrid.Columns>
+                            <tkit:DataGridTemplateColumn Header="Tipo etiqueta" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind Etiqueta,Mode=OneWay,Converter={StaticResource etiquetaToTypeName}}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Etiqueta" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind Etiqueta.Name,Mode=OneWay}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Tipo" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind Tipo,Mode=OneWay}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Meta mensual" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind MetaMensual,Mode=OneWay,Converter={StaticResource doubletocurrency}}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Meta diaria" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind MetaDiaria,Mode=OneWay,Converter={StaticResource doubletocurrency}}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Valor actual" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind ValorActual,Mode=OneWay,Converter={StaticResource doubletocurrency}}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                            <tkit:DataGridTemplateColumn Header="Falta" Width="1*">
+                                <tkit:DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate x:DataType="core:Plan">
+                                        <TextBlock Text="{x:Bind Falta,Mode=OneWay,Converter={StaticResource doubletocurrency}}" TextAlignment="Center"/>
+                                    </DataTemplate>
+                                </tkit:DataGridTemplateColumn.CellTemplate>
+                            </tkit:DataGridTemplateColumn>
+                        </tkit:DataGrid.Columns>
+                    </tkit:DataGrid>
+                </Grid>
+            </PivotItem>
+        </Pivot>
         <CommandBar 
             DefaultLabelPosition="Right" 
             ClosedDisplayMode="Compact" 
@@ -439,10 +589,14 @@
                         <ColumnDefinition/>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Libre" VerticalAlignment="Center" Foreground="White" Margin="8 0 0 0"/>
                     <TextBlock Text="{x:Bind Container.Medidas.Libre,Mode=OneWay,Converter={StaticResource doubletocurrency}}" VerticalAlignment="Center" Grid.Column="1" Foreground="White"/>
-                    <StackPanel x:Name="SP_Guardando" Orientation="Horizontal" Height="40" Visibility="Collapsed" Padding="8 0 0 0" Spacing="8" Grid.Column="2">
+                    <TextBlock Text="{x:Bind Container.PayDaysDAO.StartDate,Mode=OneWay,Converter={StaticResource datePrefix},ConverterParameter=Desde: }" VerticalAlignment="Center" Grid.Column="2" Foreground="White"/>
+                    <TextBlock Text="{x:Bind Container.PayDaysDAO.EndDate,Mode=OneWay,Converter={StaticResource datePrefix},ConverterParameter=Hasta: }" VerticalAlignment="Center" Grid.Column="3" Foreground="White"/>
+                    <StackPanel x:Name="SP_Guardando" Orientation="Horizontal" Height="40" Visibility="Collapsed" Padding="8 0 0 0" Spacing="8" Grid.Column="4">
                         <TextBlock Text="Guardando" Foreground="White" VerticalAlignment="Center"/>
                         <ProgressRing x:Name="PR_Guardando" Width="32" Height="32" IsActive="True" Foreground="White"/>
                     </StackPanel>
@@ -453,7 +607,7 @@
                     <KeyboardAccelerator Key="G" Modifiers="Control"/>
                 </AppBarButton.KeyboardAccelerators>
             </AppBarButton>
-            <AppBarButton x:Name="ABB_AddTrans" Label="Transacción" x:Uid="transaccion" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}" RequestedTheme="Dark">
+            <AppBarButton x:Name="ABB_AddTrans" Label="Transacción" x:Uid="transaccion" AllowFocusOnInteraction="True" Style="{StaticResource DefaultStyle}" RequestedTheme="Dark" Click="AddTrans_Click">
                 <AppBarButton.KeyboardAccelerators>
                     <KeyboardAccelerator Key="T" Modifiers="Menu"/>
                 </AppBarButton.KeyboardAccelerators>
@@ -462,58 +616,7 @@
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
                     <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}" Closing="AddTransFlyout_Closing">
-                        <StackPanel x:Name="SP_AddTransaccion" Width="{StaticResource	FlyoutThemeTouchMinWidth}" CornerRadius="4">
-                            <Border Background="{ThemeResource Brush_Accent2Background}" Padding="8">
-                                <TextBlock x:Uid="nuevatransaccion" Foreground="{ThemeResource Brush_Accent2Foreground}" Text="Nueva transacción" TextAlignment="Center"/>
-                            </Border>
-                            <StackPanel x:Name="SP_TransForm" Margin="8">
-                                <ComboBox x:Name="CB_Tipo" x:Uid="CB_tipo" Header="Tipo" HorizontalAlignment="Stretch" SelectionChanged="CB_TipoSelected" PlaceholderText="Seleccionar tipo">
-                                    <x:String>Entrada</x:String>
-                                    <x:String>Movimiento</x:String>
-                                    <x:String>Salida</x:String>
-                                    <x:String>Prestamo</x:String>
-                                    <x:String>Pago</x:String>
-                                </ComboBox>
-                                <CalendarDatePicker x:Name="CDP_Fecha" Header="Fecha" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" DateChanged="CDP_Fecha_DateChanged"/>
-                                <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="Origen" HorizontalAlignment="Stretch"/>
-                                        <ComboBox x:Name="CB_Origen" HorizontalAlignment="Stretch" SelectionChanged="CB_Origen_SelectionChanged" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay}"/>
-                                        <Button x:Name="B_Origen" Click="B_Origen_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresOrigenes.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
-                                    </StackPanel>
-                                </Grid>
-                                <Grid Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}">
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Text="Destino" HorizontalAlignment="Stretch"/>
-                                        <ComboBox x:Name="CB_Destino" HorizontalAlignment="Stretch" SelectionChanged="CB_Origen_SelectionChanged" Visibility="{x:Bind TheresDestinos.Visibility,Mode=OneWay}"/>
-                                        <Button x:Name="B_Destino" Click="B_Destino_Click" Content="Clickme" HorizontalAlignment="Stretch" Visibility="{x:Bind TheresDestinos.Visibility,Mode=OneWay,Converter={StaticResource notgate}}"/>
-                                    </StackPanel>
-                                </Grid>
-                                <muxc:NumberBox 
-                                    x:Name="TB_Valor" 
-                                    Header="Valor" 
-                                    PlaceholderText="1+2^2"
-                                    AcceptsExpression="True"
-                                    ValidationMode="InvalidInputOverwritten"
-                                    ValueChanged="TB_Valor_ValueChanged"
-                                    HorizontalAlignment="Stretch" 
-                                    Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}"
-                                    />
-                                <TextBox x:Name="TB_Descripcion" Header="Descripción" HorizontalAlignment="Stretch" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" PlaceholderText="Descripción"/>
-                            </StackPanel>
-                            <CommandBar DefaultLabelPosition="Right">
-                                <AppBarButton x:Uid="guardar" x:Name="APB_GuardarTrans" Label="Listo" Icon="Accept" Click="AddTransaccion_Click" Visibility="{x:Bind TipoSelected.Visibility,Mode=OneWay}" IsEnabled="False">
-                                    <AppBarButton.KeyboardAccelerators>
-                                        <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind SP_AddTransaccion}"/>
-                                    </AppBarButton.KeyboardAccelerators>
-                                </AppBarButton>
-                                <AppBarButton x:Uid="cancelar" Label="Cancelar" Icon="Cancel" Click="AppBarCancelTransButton_Click">
-                                    <AppBarButton.KeyboardAccelerators>
-                                        <KeyboardAccelerator Key="Escape" ScopeOwner="{x:Bind SP_AddTransaccion}"/>
-                                    </AppBarButton.KeyboardAccelerators>
-                                </AppBarButton>
-                            </CommandBar>
-                        </StackPanel>
+                        <Frame x:Name="Frame_AddTransaction"/>
                     </Flyout>
                 </AppBarButton.Flyout>
             </AppBarButton>
@@ -550,6 +653,8 @@
                         <KeyboardAccelerator Key="C" Modifiers="Menu" />
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
+                <AppBarSeparator/>
+                <AppBarButton Label="Configuración" AllowFocusOnInteraction="True" Icon="Setting" Click="ConfiguracionButton_Click"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
         <!--#region Dialogs & Popups-->
@@ -582,36 +687,10 @@
             Visibility="Collapsed"/>
 
         <Popup
-            x:Name="Popup_IngresoForm"
+            x:Name="Popup_MultiUse"
             IsOpen="False"
             IsLightDismissEnabled="True"
-            LightDismissOverlayMode="On" 
-            Grid.RowSpan="2"
-            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
-            Translation="0,0,8">
-            <Popup.Shadow>
-                <ThemeShadow/>
-            </Popup.Shadow>
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-            <PScontrols:AddEtiquetaForm 
-                x:Name="AEF_Ingreso"
-                x:Uid="nuevoingreso"
-                TipoEtiqueta="Ingreso" 
-                Style="{StaticResource EtiquetaFormStyle}"
-                Icon="Accept"
-                HeaderText="Nueva fuente de ingresos"
-                Click="AddIngreso_Click"
-                            />
-        </Popup>
-        <Popup 
-            x:Name="Popup_CuentaForm" 
-            IsOpen="False" 
-            IsLightDismissEnabled="True" 
-            LightDismissOverlayMode="On" 
+            LightDismissOverlayMode="On"
             Grid.RowSpan="2"
             GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
             Translation="0,0,32"
@@ -624,95 +703,7 @@
                     <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
                 </TransitionCollection>
             </Popup.ChildTransitions>
-            <PScontrols:AddEtiquetaForm 
-                x:Name="AEF_Cuenta" 
-                x:Uid="nuevacuenta"
-                TipoEtiqueta="Cuenta"
-                Style="{StaticResource EtiquetaFormStyle}"
-                Icon="Accept"
-                HeaderText="Nueva cuenta"
-                Click="AddCuenta_Click"
-                            />
-        </Popup>
-        <Popup 
-            x:Name="Popup_GastoForm" 
-            IsOpen="False" 
-            IsLightDismissEnabled="True" 
-            LightDismissOverlayMode="On" 
-            Grid.RowSpan="2"
-            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
-            Translation="0,0,32"
-            >
-            <Popup.Shadow>
-                <ThemeShadow/>
-            </Popup.Shadow>
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-            <PScontrols:AddEtiquetaForm 
-                x:Name="AEF_Gasto" 
-                x:Uid="nuevogasto"
-                TipoEtiqueta="Gasto"
-                Style="{StaticResource EtiquetaFormStyle}"
-                Icon="Accept"
-                HeaderText="Nuevo gasto"
-                Click="AddGasto_Click"
-                            />
-        </Popup>
-        <Popup 
-            x:Name="Popup_CreditoForm" 
-            IsOpen="False" 
-            IsLightDismissEnabled="True" 
-            LightDismissOverlayMode="On" 
-            Grid.RowSpan="2"
-            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
-            Translation="0,0,32"
-            >
-            <Popup.Shadow>
-                <ThemeShadow/>
-            </Popup.Shadow>
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-            <PScontrols:AddEtiquetaForm 
-                x:Name="AEF_Credito" 
-                x:Uid="nuevocredito"
-                TipoEtiqueta="Credito"
-                Style="{StaticResource EtiquetaFormStyle}"
-                Icon="Accept"
-                HeaderText="Nuevo credito"
-                Click="AddCredito_Click"
-                            />
-        </Popup>
-
-        <Popup
-            x:Name="Popup_EtiquetaEditForm"
-            IsOpen="False" 
-            IsLightDismissEnabled="True" 
-            LightDismissOverlayMode="On" 
-            Grid.RowSpan="2"
-            GettingFocus="{x:Bind aux:JevoVisual.GettingFocus}"
-            Translation="0,0,32">
-            <Popup.Shadow>
-                <ThemeShadow/>
-            </Popup.Shadow>
-            <Popup.ChildTransitions>
-                <TransitionCollection>
-                    <PopupThemeTransition FromHorizontalOffset="0" FromVerticalOffset="0"/>
-                </TransitionCollection>
-            </Popup.ChildTransitions>
-            <PScontrols:AddEtiquetaForm
-                x:Name="AEF_EtiquetaEdit"
-                TipoEtiqueta="Ingreso"
-                Style="{StaticResource EtiquetaFormStyle}"
-                HeaderText="Editar Nombre"
-                Click="EditEtiqueta_Click"
-                Label="Listo"
-                Icon="Accept"/>
+            <Frame x:Name="Frame_MultiUse"/>
         </Popup>
         <!--#endregion-->
     </Grid>

@@ -133,17 +133,32 @@
     <Compile Include="ControlesPersonalizados\AddEtiquetaForm.xaml.cs">
       <DependentUpon>AddEtiquetaForm.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Converters\DatePrefix.cs" />
+    <Compile Include="Converters\EtiquetaToTypeName.cs" />
+    <Compile Include="Converters\NullTo0.cs" />
     <Compile Include="Converters\DateToString.cs" />
     <Compile Include="Converters\StringPrefix.cs" />
     <Compile Include="Converters\NotGate.cs" />
     <Compile Include="Converters\DoubleToCurrency.cs" />
+    <Compile Include="Forms\EtiquetaForm.xaml.cs">
+      <DependentUpon>EtiquetaForm.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\TransForm.xaml.cs">
+      <DependentUpon>TransForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="LoadingPage.xaml.cs">
       <DependentUpon>LoadingPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Forms\PlanForm.xaml.cs">
+      <DependentUpon>PlanForm.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SettingsPage.xaml.cs">
+      <DependentUpon>SettingsPage.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -218,6 +233,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Forms\EtiquetaForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Forms\TransForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="LoadingPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -225,6 +248,10 @@
     <Page Include="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Forms\PlanForm.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="ResourceDictionaries\MainPageDictionaries\Dark.xaml">
       <SubType>Designer</SubType>
@@ -234,10 +261,17 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="SettingsPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.9</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls.DataGrid">
+      <Version>6.1.1</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Lottie">
       <Version>6.1.0</Version>
