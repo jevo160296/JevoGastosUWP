@@ -15,3 +15,5 @@ Then you can install the app by runing the .msixbundle file.
 
 Hope you enyoi it, I have worked a lot to keep things as simple as posible, so I hope you can discover the functionalities of the app by yourself.
 Actually im working on a tutorial, for now I hope you can handle it ❤.
+
+# If you want to contribute to the project, fork this repository, and if you have any cuestions about some of the code included you can always ask me.
