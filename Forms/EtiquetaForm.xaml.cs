@@ -1,6 +1,7 @@
 ﻿using JevoGastosCore;
 using JevoGastosCore.Enums;
 using JevoGastosCore.Model;
+using JevoGastosCore.ModelView;
 using JevoGastosUWP.ControlesPersonalizados;
 using System;
 using Windows.UI.Xaml;
@@ -20,13 +21,13 @@ namespace JevoGastosUWP.Forms
         public class Parameters
         {
             public GastosContainer Container { get; set; }
-            public TipoEtiqueta TipoEtiqueta { get; set; }
+            public TipoEtiqueta? TipoEtiqueta { get; set; }
             public Etiqueta Etiqueta { get; set; }
             public bool IsEditMode { get; set; }
             public Parameters(
                 GastosContainer container,
                 Etiqueta etiqueta=null,
-                TipoEtiqueta tipoEtiqueta=TipoEtiqueta.Ingreso,
+                TipoEtiqueta? tipoEtiqueta= null,
                 bool isEditMode=false
                 )
             {
@@ -53,7 +54,16 @@ namespace JevoGastosUWP.Forms
         {
             base.OnNavigatedTo(e);
             parameters = (Parameters)e.Parameter;
+            parameters.TipoEtiqueta = parameters.TipoEtiqueta ?? (parameters.Etiqueta is null ? TipoEtiqueta.Ingreso : EtiquetaDAO.Tipo(parameters.Etiqueta));
             AddEtiquetaForm coso = new AddEtiquetaForm();
+            if (parameters.TipoEtiqueta==TipoEtiqueta.Cuenta)
+            {
+                AEF_Etiqueta.CB_Visibility = Visibility.Visible;
+            }
+            else
+            {
+                AEF_Etiqueta.CB_Visibility = Visibility.Collapsed;
+            }
             if (parameters.IsEditMode)
             {
                 InitializeEditMode();
@@ -86,8 +96,13 @@ namespace JevoGastosUWP.Forms
         }
         private void InitializeEditMode()
         {
+            AEF_Etiqueta.HeaderText = "Editar etiqueta";
             AEF_Etiqueta.Etiqueta = parameters.Etiqueta;
             AEF_Etiqueta.TextBox.Text = parameters.Etiqueta.Name;
+            if (parameters.TipoEtiqueta==TipoEtiqueta.Cuenta)
+            {
+                AEF_Etiqueta.CheckBox.IsChecked = ((Cuenta)parameters.Etiqueta).EsAhorro;
+            }
             AEF_Etiqueta.Click += EditClick;
             AEF_Etiqueta.TextBox.SelectAll();
         }
@@ -95,6 +110,10 @@ namespace JevoGastosUWP.Forms
         private void EditClick(object sender, RoutedEventArgs e)
         {
             AEF_Etiqueta.Etiqueta.Name = AEF_Etiqueta.TextBox.Text;
+            if (parameters.TipoEtiqueta == TipoEtiqueta.Cuenta)
+            {
+                ((Cuenta)AEF_Etiqueta.Etiqueta).EsAhorro = AEF_Etiqueta.CheckBox.IsChecked ?? false;
+            }
             RequestCloseForm();
         }
 
@@ -109,7 +128,7 @@ namespace JevoGastosUWP.Forms
                         AddIngreso(form.TextBox.Text);
                         break;
                     case TipoEtiqueta.Cuenta:
-                        AddCuenta(form.TextBox.Text);
+                        AddCuenta(form.TextBox.Text, form.CheckBox.IsChecked ?? false);
                         break;
                     case TipoEtiqueta.Gasto:
                         AddGasto(form.TextBox.Text);
@@ -132,9 +151,9 @@ namespace JevoGastosUWP.Forms
         {
             parameters.Container.IngresoDAO.Add(name);
         }
-        private void AddCuenta(string name)
+        private void AddCuenta(string name,bool esAhorro)
         {
-            parameters.Container.CuentaDAO.Add(name);
+            parameters.Container.CuentaDAO.Add(name,esAhorro);
         }
         private void AddGasto(string name)
         {

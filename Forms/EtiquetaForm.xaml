@@ -33,5 +33,6 @@
         x:Name="AEF_Etiqueta"
         x:Uid="nuevoingreso" 
         Style="{StaticResource EtiquetaFormStyle}"
+        CB_Text="Es ahorro"
         Icon="Accept"/>
 </Page>

@@ -88,6 +88,7 @@ namespace JevoGastosUWP.Forms
         private ObservableCollection<Cuenta> Cuentas => parameters.Container.CuentaDAO.Items;
         private ObservableCollection<Gasto> Gastos => parameters.Container.GastoDAO.Items;
         private ObservableCollection<Credito> Creditos => parameters.Container.CreditoDAO.Items;
+        private IEnumerable<Etiqueta> CuentasCreditos;
         #endregion
         public TransForm()
         {
@@ -102,6 +103,7 @@ namespace JevoGastosUWP.Forms
             TipoSelected.PropertyChanged -= TipoSelected_PropertyChanged;
             TipoSelected.PropertyChanged += TipoSelected_PropertyChanged;
             CB_Tipo.ItemsSource = Enum.GetValues(typeof(TipoTransaccion)).Cast<TipoTransaccion>().OrderBy(p=>TTransaccionesOrden[p]).ToArray<TipoTransaccion>();
+            CuentasCreditos = Enumerable.Concat<Etiqueta>(Cuentas, Creditos);
             if (parameters.IsEditMode)
             {
                 Inicializar_EditMode();
@@ -121,8 +123,8 @@ namespace JevoGastosUWP.Forms
             TipoTransaccion tipoTransaccion = TransaccionDAO.Tipo(parameters.Transaccion);
             CB_Tipo.SelectedItem = tipoTransaccion;
             CDP_Fecha.Date = parameters.Transaccion.Fecha;
-            CB_Origen.SelectedItem = parameters.Transaccion.Origen;
-            CB_Destino.SelectedItem = parameters.Transaccion.Destino;
+            CB_Origen.SelectedItem = CB_Origen.Items.Where(p => ((Etiqueta)p).Id == (parameters.Transaccion.Origen).Id).First();
+            CB_Destino.SelectedItem = CB_Destino.Items.Where(p => ((Etiqueta)p).Id == parameters.Transaccion.Destino.Id).First();
             TB_Valor.Value = parameters.Transaccion.Valor;
             TB_Descripcion.Text = parameters.Transaccion.Descripcion;
         }
@@ -241,6 +243,10 @@ namespace JevoGastosUWP.Forms
         private void Etiquetas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             CheckOrigenesDestinos();
+            if (CuentasCreditos.Count()!=Cuentas.Count+Creditos.Count)
+            {
+                CuentasCreditos= Enumerable.Concat<Etiqueta>(Cuentas, Creditos);
+            }
         }
         private void CB_Origen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -308,9 +314,9 @@ namespace JevoGastosUWP.Forms
                 {
                     case TipoTransaccion.Entrada:
                         CB_Origen.ItemsSource = Ingresos;
-                        CB_Destino.ItemsSource = Cuentas;
+                        CB_Destino.ItemsSource = CuentasCreditos;
                         CB_Origen.PlaceholderText = "Ingresos";
-                        CB_Destino.PlaceholderText = "Cuentas";
+                        CB_Destino.PlaceholderText = "Cuenta o Credito";
                         B_Origen.Content = "Nuevo Ingreso";
                         B_Destino.Content = "Nueva Cuenta";
                         break;
@@ -323,9 +329,9 @@ namespace JevoGastosUWP.Forms
                         B_Destino.Content = "Nueva Cuenta";
                         break;
                     case TipoTransaccion.Salida:
-                        CB_Origen.ItemsSource = Cuentas;
+                        CB_Origen.ItemsSource = CuentasCreditos;
                         CB_Destino.ItemsSource = Gastos;
-                        CB_Origen.PlaceholderText = "Cuentas";
+                        CB_Origen.PlaceholderText = "Cuenta o Credito";
                         CB_Destino.PlaceholderText = "Gastos";
                         B_Origen.Content = "Nueva Cuenta";
                         B_Destino.Content = "Nuevo Gasto";

@@ -25,6 +25,11 @@
             x:Name="TB_Name" 
             Header="{x:Bind Header,Mode=OneWay}" 
             Margin="8"/>
+        <CheckBox 
+            x:Name="CB_EsAhorro"
+            Content="{x:Bind CB_Text,Mode=OneWay}"
+            Margin="8"
+            Visibility="{x:Bind CB_Visibility,Mode=OneWay}"/>
         <TextBlock Margin="8 0 8 8" Text="{x:Bind ErrorText,Mode=OneWay}" Visibility="{x:Bind IsErrorRaised,Mode=OneWay}" Foreground="Red"/>
         <CommandBar DefaultLabelPosition="Right">
             <AppBarButton 

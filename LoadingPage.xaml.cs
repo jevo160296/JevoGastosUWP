@@ -22,29 +22,26 @@ namespace JevoGastosUWP
         {
             base.OnNavigatedTo(e);
             GastosContainer gastosContainer;
-            double max = 7;
+            double max = 6;
             //gastosContainer = await LoadDataAsync();
             gastosContainer = await LoadContainerAsync();
             ProgressBar.IsIndeterminate = false;
             ProgressBar.Value = 1 / max*100;
             TB_Detalles.Text = "Cargando transacciones...";
             await LoadTransaccionesAsync(gastosContainer);
-            ProgressBar.Value = 2 / max*100;
-            TB_Detalles.Text = "Cargando etiquetas...";
-            await LoadEtiquetasAsync(gastosContainer);
             TB_Detalles.Text = "Cargando ingresos...";
-            ProgressBar.Value = 3 / max*100;
+            ProgressBar.Value = 2 / max*100;
             await LoadIngresosAsync(gastosContainer);
             TB_Detalles.Text = "Cargando cuentas...";
-            ProgressBar.Value = 4 / max*100;
+            ProgressBar.Value = 3 / max*100;
             await LoadCuentasAsync(gastosContainer);
             TB_Detalles.Text = "Cargando gastos...";
-            ProgressBar.Value = 5 / max*100;
+            ProgressBar.Value = 4 / max*100;
             await LoadGastosAsync(gastosContainer);
             TB_Detalles.Text = "Cargando plan...";
-            ProgressBar.Value = 6 / max * 100;
+            ProgressBar.Value = 5 / max * 100;
             await LoadPlanesAsync(gastosContainer);
-            ProgressBar.Value = 7 / max*100;
+            ProgressBar.Value = 6 / max*100;
             this.Frame.Navigate(typeof(MainPage), gastosContainer);
         }
 

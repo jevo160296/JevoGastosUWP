@@ -36,6 +36,13 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 typeof(UserControl),
                 new PropertyMetadata(new SolidColorBrush(Windows.UI.Color.FromArgb(1, 0, 0, 0)))
                 );
+        public static readonly DependencyProperty CB_TextProperty =
+            DependencyProperty.Register(
+                "CB_Text",
+                typeof(string),
+                typeof(UserControl),
+                new PropertyMetadata("")
+                );
         public static readonly DependencyProperty HeaderTextProperty =
             DependencyProperty.Register(
                 "HeaderText",
@@ -85,6 +92,13 @@ namespace JevoGastosUWP.ControlesPersonalizados
                 typeof(UserControl),
                 new PropertyMetadata(null)
                 );
+        public static readonly DependencyProperty CB_VisibilityProperty =
+            DependencyProperty.Register(
+                "CB_Visibility",
+                typeof(Visibility),
+                typeof(UserControl),
+                new PropertyMetadata(Visibility.Collapsed)
+                );
         #endregion
         #region Properties
         public TipoEtiqueta TipoEtiqueta
@@ -127,14 +141,22 @@ namespace JevoGastosUWP.ControlesPersonalizados
             get => (string)GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
         }
-        public TextBox TextBox
+        public string CB_Text
         {
-            get => TB_Name;
+            get => (string)GetValue(CB_TextProperty);
+            set => SetValue(CB_TextProperty, value);
         }
+        public TextBox TextBox => TB_Name;
+        public CheckBox CheckBox => CB_EsAhorro;
         public bool IsErrorRaised
         {
             get => (bool)GetValue(IsErrorRaisedProperty);
             set => SetValue(IsErrorRaisedProperty, value);
+        }
+        public Visibility CB_Visibility
+        {
+            get => (Visibility)GetValue(CB_VisibilityProperty);
+            set => SetValue(CB_VisibilityProperty, value);
         }
         public IconElement Icon
         {

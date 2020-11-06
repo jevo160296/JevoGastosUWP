@@ -160,7 +160,10 @@ namespace JevoGastosUWP
         #region ChangesTracker
         private void ChangeTracker_Tracked(object sender, Microsoft.EntityFrameworkCore.ChangeTracking.EntityTrackedEventArgs e)
         {
-            PendentChanges.Value = true;
+            if (e.Entry.State!=EntityState.Unchanged)
+            {
+                PendentChanges.Value = true;
+            }
         }
         private void ChangeTracker_StateChanged(object sender, Microsoft.EntityFrameworkCore.ChangeTracking.EntityStateChangedEventArgs e)
         {
