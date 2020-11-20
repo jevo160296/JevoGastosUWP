@@ -1,4 +1,6 @@
-﻿using System;
+﻿using JevoCrypt;
+using JevoCrypt.Classes;
+using System;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
@@ -55,7 +57,17 @@ namespace JevoGastosUWP
                     // Cuando no se restaura la pila de navegación, navegar a la primera página,
                     // configurando la nueva página pasándole la información requerida como
                     //parámetro de navegación
-                    rootFrame.Navigate(typeof(LoadingPage), e);
+                    //Cargar contenedor de usuarios
+                    UsersContainer usersContainer = new UsersContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path);
+                    User unlockedUser= usersContainer.UserDAO.UnlockedUser();
+                    if (unlockedUser is null)
+                    {
+                        rootFrame.Navigate(typeof(SignInPage), new SignInPage.Parameters(usersContainer,e));
+                    }
+                    else
+                    {
+                        rootFrame.Navigate(typeof(LoadingPage), new LoadingPage.Parameters(unlockedUser,usersContainer,e));
+                    }
                 }
                 // Asegurarse de que la ventana actual está activa.
                 Window.Current.Activate();

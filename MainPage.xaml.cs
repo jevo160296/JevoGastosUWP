@@ -1,4 +1,6 @@
-﻿using JevoGastosCore;
+﻿using JevoCrypt;
+using JevoCrypt.Classes;
+using JevoGastosCore;
 using JevoGastosCore.Enums;
 using JevoGastosCore.Model;
 using JevoGastosCore.ModelView;
@@ -12,6 +14,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Controls.Primitives;
@@ -81,11 +84,27 @@ namespace JevoGastosUWP
             public Etiqueta Item { get; set; }
             public ListViewItem ListViewItem { get; set; }
         }
+        public class Parameters
+        {
+            public User User { get; set; }
+            public UsersContainer UsersContainer { get; set; }
+            public GastosContainer Container { get; set; }
+            public LaunchActivatedEventArgs e { get; set; }
+
+            public Parameters(GastosContainer container,User user,UsersContainer usersContainer,LaunchActivatedEventArgs e)
+            {
+                this.Container = container;
+                this.User = user;
+                this.UsersContainer = usersContainer;
+                this.e = e;
+            }
+        }
         #endregion
         #region InternalVariables
         private ObservableCollection<Transaccion> relatedTrans = new ObservableCollection<Transaccion>();
         private ObservableCollection<Plan> relatedPlanes = new ObservableCollection<Plan>();
 
+        private Parameters parameters;
         private GastosContainer Container;
         private ObservableCollection<Etiqueta> Etiquetas => Container.EtiquetaDAO.Items;
         private ObservableCollection<Ingreso> Ingresos => Container.IngresoDAO.Items;
@@ -114,31 +133,43 @@ namespace JevoGastosUWP
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
-            Container = (GastosContainer)e.Parameter;
+            this.parameters = (Parameters)e.Parameter;
+            Container = parameters.Container;
             ConfigureView();
+        }
+        protected override void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        {
+            base.OnNavigatingFrom(e);
+            Windows.UI.Core.Preview.SystemNavigationManagerPreview.GetForCurrentView().CloseRequested -= MainPage_CloseRequested;
         }
         private async void MainPage_CloseRequested(object sender, Windows.UI.Core.Preview.SystemNavigationCloseRequestedPreviewEventArgs e)
         {
-            var deferral = e.GetDeferral();
+            Windows.Foundation.Deferral deferral = e.GetDeferral();
+            ContentDialogResult contentDialogResult = await MainPage_CloseRequested();
+            switch (contentDialogResult)
+            {
+                case ContentDialogResult.None:
+                    e.Handled = true;
+                    break;
+                case ContentDialogResult.Primary:
+                    await SaveAllAsync();
+                    break;
+                case ContentDialogResult.Secondary:
+                    break;
+                default:
+                    break;
+            }
+            deferral.Complete();
+        }
+        private async Task<ContentDialogResult> MainPage_CloseRequested()
+        {
             if (PendentChanges.Value)
             {
                 CD_Salir.Visibility = Visibility.Visible;
                 ContentDialogResult contentDialogResult = await CD_Salir.ShowAsync();
-                switch (contentDialogResult)
-                {
-                    case ContentDialogResult.None:
-                        e.Handled = true;
-                        break;
-                    case ContentDialogResult.Primary:
-                        await SaveAllAsync();
-                        break;
-                    case ContentDialogResult.Secondary:
-                        break;
-                    default:
-                        break;
-                }
+                return contentDialogResult;
             }
-            deferral.Complete();
+            return ContentDialogResult.Secondary;
         }
         private void ConfigureView()
         {
@@ -326,8 +357,8 @@ namespace JevoGastosUWP
             };
             flyout.ShowAt(row, options);
             TransForm.Parameters parameters = new TransForm.Parameters(Container, true, transaccion);
-            Frame_EditTrans.Navigate(typeof(TransForm), parameters, new SuppressNavigationTransitionInfo());
-            ((TransForm)Frame_EditTrans.Content).CloseRequested += EditTransForm_CloseRequested;
+            Frame_FlyoutEditTrans.Navigate(typeof(TransForm), parameters, new SuppressNavigationTransitionInfo());
+            ((TransForm)Frame_FlyoutEditTrans.Content).CloseRequested += EditTransForm_CloseRequested;
         }
 
         private void EditTransForm_CloseRequested(TransForm.Parameters parameters)
@@ -345,7 +376,7 @@ namespace JevoGastosUWP
                 .ShowAt(
                 dataGridRow,
                 new FlyoutShowOptions() { Placement = FlyoutPlacementMode.Auto });
-            Frame_EditPlan.Navigate(
+            Frame_FlyoutEditPlan.Navigate(
                 typeof(PlanForm),
                 new PlanForm.Parameters(
                     Container,
@@ -561,12 +592,20 @@ namespace JevoGastosUWP
             Frame_MultiUse.Navigate(
                 typeof(EtiquetaForm),
                 parameters, new SuppressNavigationTransitionInfo());
-            ((EtiquetaForm)Frame_MultiUse.Content).CloseRequested += EtiquetaForm_CloseRequested;
+            ((EtiquetaForm)Frame_MultiUse.Content).CloseRequested += FrameMultiUser_RequestClose;
         }
 
-        private void EtiquetaForm_CloseRequested()
+        private void FrameMultiUser_RequestClose()
         {
             Popup_MultiUse.IsOpen = false;
+        }
+        private void UserForm_RequestClose(bool cerrarSesion)
+        {
+            FrameMultiUser_RequestClose();
+            if (cerrarSesion)
+            {
+                this.Frame.Navigate(typeof(SignInPage), new SignInPage.Parameters(this.parameters.UsersContainer, null), new ContinuumNavigationTransitionInfo());
+            }
         }
 
         private void ResetPopups()
@@ -789,6 +828,72 @@ namespace JevoGastosUWP
         private void AddTransacctionForm_CloseRequested(TransForm.Parameters e)
         {
             ABB_AddTrans.Flyout.Hide();
+        }
+
+        private async void SignOut_Click(object sender, RoutedEventArgs e)
+        {
+            this.parameters.UsersContainer.UserDAO.SignOut();
+            ContentDialogResult contentDialogResult = await MainPage_CloseRequested();
+            switch (contentDialogResult)
+            {
+                case ContentDialogResult.None:
+                    break;
+                case ContentDialogResult.Primary:
+                    await SaveAllAsync();
+                    this.Frame.Navigate(typeof(SignInPage), new SignInPage.Parameters(this.parameters.UsersContainer, null),new ContinuumNavigationTransitionInfo());
+                    break;
+                case ContentDialogResult.Secondary:
+                    this.Frame.Navigate(typeof(SignInPage), new SignInPage.Parameters(this.parameters.UsersContainer, null), new ContinuumNavigationTransitionInfo());
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void CambiarUsuario_Click(object sender, RoutedEventArgs e)
+        {
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(typeof(UserForm),
+                new UserForm.Parameters(
+                    this.parameters.UsersContainer,
+                    this.parameters.User,
+                    UserForm.TipoInicialización.changeusername,
+                    this.Container
+                    ),
+                new SuppressNavigationTransitionInfo());
+            ((UserForm)Frame_MultiUse.Content).CloseRequested += UserForm_RequestClose;
+        }
+
+        private void CambiarContraseña_Click(object sender, RoutedEventArgs e)
+        {
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(
+                typeof(UserForm),
+                new UserForm.Parameters(
+                    this.parameters.UsersContainer,
+                    this.parameters.User,
+                    UserForm.TipoInicialización.changepassword
+                    ),
+                new SuppressNavigationTransitionInfo());
+            ((UserForm)Frame_MultiUse.Content).CloseRequested += UserForm_RequestClose;
+        }
+
+        private void EliminarUsuario_Click(object sender, RoutedEventArgs e)
+        {
+            bool respuesta = false;
+            UserForm.Parameters parameter = new UserForm.Parameters(
+                    this.parameters.UsersContainer,
+                    this.parameters.User,
+                    UserForm.TipoInicialización.deleteaccount,
+                    this.Container,
+                    respuesta
+                    );
+            Popup_MultiUse.IsOpen = true;
+            Frame_MultiUse.Navigate(
+                typeof(UserForm),
+                parameter,
+                new SuppressNavigationTransitionInfo());
+            ((UserForm)Frame_MultiUse.Content).CloseRequested += UserForm_RequestClose;
         }
     }
 }

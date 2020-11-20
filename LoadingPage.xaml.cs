@@ -1,8 +1,12 @@
-﻿using JevoGastosCore;
+﻿using JevoCrypt;
+using JevoCrypt.Classes;
+using JevoGastosCore;
 using System;
 using System.Threading.Tasks;
+using Windows.ApplicationModel.Activation;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
+using Windows.UI.Xaml.Media.Animation;
 
 // La plantilla de elemento Página en blanco está documentada en https://go.microsoft.com/fwlink/?LinkId=234238
 
@@ -13,6 +17,21 @@ namespace JevoGastosUWP
     /// </summary>
     public sealed partial class LoadingPage : Page
     {
+        public class Parameters
+        {
+            public User User { get; set; }
+            public UsersContainer UsersContainer { get; set; }
+            public LaunchActivatedEventArgs e { get; set; }
+
+            public Parameters(User user,UsersContainer usersContainer, LaunchActivatedEventArgs e)
+            {
+                this.User = user;
+                this.UsersContainer = usersContainer;
+                this.e = e;
+            }
+        }
+        private User User;
+        private Parameters parameters;
         public LoadingPage()
         {
             this.InitializeComponent();
@@ -21,6 +40,8 @@ namespace JevoGastosUWP
         protected async override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
+            this.parameters = (Parameters)(e.Parameter);
+            User = parameters.User;
             GastosContainer gastosContainer;
             double max = 6;
             //gastosContainer = await LoadDataAsync();
@@ -42,7 +63,7 @@ namespace JevoGastosUWP
             ProgressBar.Value = 5 / max * 100;
             await LoadPlanesAsync(gastosContainer);
             ProgressBar.Value = 6 / max*100;
-            this.Frame.Navigate(typeof(MainPage), gastosContainer);
+            this.Frame.Navigate(typeof(MainPage), new MainPage.Parameters(gastosContainer,User,parameters.UsersContainer,null),new DrillInNavigationTransitionInfo());
         }
 
         private async Task<GastosContainer> LoadDataAsync()
@@ -92,8 +113,9 @@ namespace JevoGastosUWP
         }
         private GastosContainer LoadContainer()
         {
-            GastosContainer gastosContainer = 
-                new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path,false);
+            GastosContainer gastosContainer =
+                new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path, this.User, this.parameters.UsersContainer, false, User.UserName + ".db");
+
             return gastosContainer;
         }
         private void LoadTransacciones(GastosContainer gastosContainer)

@@ -88,7 +88,7 @@ namespace JevoGastosUWP.Forms
         private ObservableCollection<Cuenta> Cuentas => parameters.Container.CuentaDAO.Items;
         private ObservableCollection<Gasto> Gastos => parameters.Container.GastoDAO.Items;
         private ObservableCollection<Credito> Creditos => parameters.Container.CreditoDAO.Items;
-        private IEnumerable<Etiqueta> CuentasCreditos;
+        private ObservableCollection<Etiqueta> CuentasCreditos=new ObservableCollection<Etiqueta>();
         #endregion
         public TransForm()
         {
@@ -103,7 +103,7 @@ namespace JevoGastosUWP.Forms
             TipoSelected.PropertyChanged -= TipoSelected_PropertyChanged;
             TipoSelected.PropertyChanged += TipoSelected_PropertyChanged;
             CB_Tipo.ItemsSource = Enum.GetValues(typeof(TipoTransaccion)).Cast<TipoTransaccion>().OrderBy(p=>TTransaccionesOrden[p]).ToArray<TipoTransaccion>();
-            CuentasCreditos = Enumerable.Concat<Etiqueta>(Cuentas, Creditos);
+            ResetCuentasCreditos();
             if (parameters.IsEditMode)
             {
                 Inicializar_EditMode();
@@ -111,6 +111,14 @@ namespace JevoGastosUWP.Forms
             else
             {
                 Inicializar_AddMode();
+            }
+        }
+        private void ResetCuentasCreditos()
+        {
+            CuentasCreditos.Clear();
+            foreach (Etiqueta etiqueta in Enumerable.Concat<Etiqueta>(Cuentas,Creditos))
+            {
+                CuentasCreditos.Add(etiqueta);
             }
         }
         private void Inicializar_AddMode()
@@ -242,11 +250,11 @@ namespace JevoGastosUWP.Forms
         }
         private void Etiquetas_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            CheckOrigenesDestinos();
-            if (CuentasCreditos.Count()!=Cuentas.Count+Creditos.Count)
+            if (CuentasCreditos.Count() != Cuentas.Count + Creditos.Count)
             {
-                CuentasCreditos= Enumerable.Concat<Etiqueta>(Cuentas, Creditos);
+                ResetCuentasCreditos();
             }
+            CheckOrigenesDestinos();
         }
         private void CB_Origen_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -417,7 +425,6 @@ namespace JevoGastosUWP.Forms
                 parameters.Transaccion.Fecha = dateTime ?? DateTime.Now;
             }
         }
-
         private void TB_Valor_GotFocus(object sender, RoutedEventArgs e)
         {
             foreach (var accelerator in APB_GuardarTrans.KeyboardAccelerators)
@@ -426,7 +433,6 @@ namespace JevoGastosUWP.Forms
             }
             APB_GuardarTrans.KeyboardAccelerators.Clear();
         }
-
         private void TB_Valor_LostFocus(object sender, RoutedEventArgs e)
         {
             foreach (var accelerator in CachedAccelerators)
@@ -436,12 +442,10 @@ namespace JevoGastosUWP.Forms
             CachedAccelerators.Clear();
             lastpressed = null;
         }
-
         private void TB_Valor_KeyDown(object sender, KeyRoutedEventArgs e)
         {
             lastpressed = e.Key;
         }
-
         private void Page_LostFocus(object sender, RoutedEventArgs e)
         {
             if (!EditandoTrans)

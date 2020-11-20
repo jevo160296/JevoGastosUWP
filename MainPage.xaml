@@ -290,7 +290,7 @@
                                        >
                             <FlyoutBase.AttachedFlyout>
                                 <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
-                                    <Frame x:Name="Frame_EditPlan"/>
+                                    <Frame x:Name="Frame_FlyoutEditPlan"/>
                                 </Flyout>
                             </FlyoutBase.AttachedFlyout>
                             <tkit:DataGrid.Columns>
@@ -331,7 +331,7 @@
             </Flyout>
         </FlyoutBase.AttachedFlyout>
         <!--#endregion-->
-        <Pivot>
+        <Pivot Title="{x:Bind parameters.User.UserName,Mode=OneWay}">
             <PivotItem Header="Transacciones">
                 <Grid
             Grid.Row="0"
@@ -468,7 +468,7 @@
                         </Grid.ColumnDefinitions>
                         <FlyoutBase.AttachedFlyout>
                             <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}">
-                                <Frame x:Name="Frame_EditTrans"/>
+                                <Frame x:Name="Frame_FlyoutEditTrans"/>
                             </Flyout>
                         </FlyoutBase.AttachedFlyout>
                         <ContentPresenter ContentTemplate="{StaticResource ListTemplate}" Content="Transacciones"/>
@@ -615,7 +615,7 @@
                     <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE710;"/>
                 </AppBarButton.Icon>
                 <AppBarButton.Flyout>
-                    <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}" Closing="AddTransFlyout_Closing">
+                    <Flyout FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}" Closing="AddTransFlyout_Closing" LightDismissOverlayMode="On">
                         <Frame x:Name="Frame_AddTransaction"/>
                     </Flyout>
                 </AppBarButton.Flyout>
@@ -654,7 +654,29 @@
                     </AppBarButton.KeyboardAccelerators>
                 </AppBarButton>
                 <AppBarSeparator/>
-                <AppBarButton Label="Configuración" AllowFocusOnInteraction="True" Icon="Setting" Click="ConfiguracionButton_Click"/>
+                <AppBarButton 
+                    Label="Eliminar usuario" 
+                    Icon="Delete"
+                    Click="EliminarUsuario_Click"/>
+                <AppBarButton Label="Renombrar usuario" Click="CambiarUsuario_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon 
+                            FontFamily="Segoe MDL2 Assets" 
+                            Glyph="&#xE8AC;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Label="Cambiar contraseña" Click="CambiarContraseña_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE8D7;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarSeparator/>
+                <AppBarButton Label="Cerrar sesión" Click="SignOut_Click">
+                    <AppBarButton.Icon>
+                        <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72E;"/>
+                    </AppBarButton.Icon>
+                </AppBarButton>
+                <AppBarButton Label="Configuración" AllowFocusOnInteraction="True" Click="ConfiguracionButton_Click" Icon="Setting"/>
             </CommandBar.SecondaryCommands>
         </CommandBar>
         <!--#region Dialogs & Popups-->

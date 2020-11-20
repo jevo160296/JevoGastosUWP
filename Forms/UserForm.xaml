@@ -1,0 +1,54 @@
+﻿<Page
+    x:Class="JevoGastosUWP.Forms.UserForm"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JevoGastosUWP.Forms"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    Width="320"
+    Loaded="Page_Loaded">
+
+    <Grid x:Name="Grid" Padding="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
+        </Grid.RowDefinitions>
+        <TextBox x:Name="TB_UserName"
+            Header="Nombre de usuario"
+            Margin="0,0,0,12"/>
+        <PasswordBox x:Name="PB_Contraseña"
+            Header="Contraseña"
+            Grid.Row="1"
+            Margin="0,0,0,12"/>
+        <TextBox x:Name="TB_NUserName"
+            Header="Nuevo nombre de usuario"
+            Grid.Row="2"
+            Visibility="Visible"
+            Margin="0,0,0,12"/>
+        <PasswordBox x:Name="PB_NContraseña"
+            Header="Nueva contraseña"
+            Grid.Row="3"
+            Visibility="Visible"
+            Margin="0,0,0,12"/>
+        <Button x:Name="B_Listo"
+            Content="Listo"
+            Click="Listo_Clic"
+            Grid.Row="4"
+            >
+            <Button.KeyboardAccelerators>
+                <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind Grid}"/>
+            </Button.KeyboardAccelerators>
+        </Button>
+        <TextBlock x:Name="TB_Message" Grid.Row="5" Visibility="Collapsed" Text="Mensaje" Foreground="Black" TextWrapping="WrapWholeWords"/>
+        <ContentDialog
+            x:Name="CD_MultiUser"
+            Grid.RowSpan="5"
+            Visibility="Visible"/>
+    </Grid>
+</Page>

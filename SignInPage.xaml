@@ -1,0 +1,200 @@
+﻿<Page
+    x:Class="JevoGastosUWP.SignInPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:JevoGastosUWP"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    xmlns:classes="using:JevoCrypt.Classes"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    RequestedTheme="Light">
+    <Page.Resources>
+        <DataTemplate x:Key="User_Template" x:DataType="classes:User">
+            <TextBlock Text="{x:Bind UserName}"/>
+        </DataTemplate>
+        <Style x:Key="FlyoutFlyoutPresenterStyleNoPadding" TargetType="FlyoutPresenter">
+            <Setter Property="RequestedTheme" Value="Default"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="VerticalContentAlignment" Value="Stretch"/>
+            <Setter Property="IsTabStop" Value="False"/>
+            <Setter Property="Background" Value="{ThemeResource SystemControlBackgroundChromeMediumLowBrush}"/>
+            <Setter Property="BorderBrush" Value="{ThemeResource SystemControlForegroundChromeHighBrush}"/>
+            <Setter Property="BorderThickness" Value="{ThemeResource FlyoutBorderThemeThickness}"/>
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="MinWidth" Value="{ThemeResource FlyoutThemeMinWidth}"/>
+            <Setter Property="MaxWidth" Value="{ThemeResource FlyoutThemeMaxWidth}"/>
+            <Setter Property="MinHeight" Value="{ThemeResource FlyoutThemeMinHeight}"/>
+            <Setter Property="MaxHeight" Value="{ThemeResource FlyoutThemeMaxHeight}"/>
+            <Setter Property="ScrollViewer.HorizontalScrollMode" Value="Auto"/>
+            <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollMode" Value="Auto"/>
+            <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto"/>
+            <Setter Property="ScrollViewer.ZoomMode" Value="Disabled"/>
+            <Setter Property="CornerRadius" Value="4"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="FlyoutPresenter">
+                        <Border Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}" CornerRadius="{TemplateBinding CornerRadius}">
+                            <ScrollViewer x:Name="ScrollViewer" AutomationProperties.AccessibilityView="Raw" HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}" HorizontalScrollMode="{TemplateBinding ScrollViewer.HorizontalScrollMode}" VerticalScrollMode="{TemplateBinding ScrollViewer.VerticalScrollMode}" VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}" ZoomMode="{TemplateBinding ScrollViewer.ZoomMode}">
+                                <ContentPresenter ContentTemplate="{TemplateBinding ContentTemplate}" Content="{TemplateBinding Content}" ContentTransitions="{TemplateBinding ContentTransitions}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" VerticalAlignment="{TemplateBinding VerticalContentAlignment}"/>
+                            </ScrollViewer>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <SolidColorBrush x:Key="Background_SignForm_Brush" Color="White"/>
+        <AcrylicBrush x:Key="Background_Brush" TintColor="White" TintLuminosityOpacity="0.5" TintOpacity="0.8" BackgroundSource="HostBackdrop" FallbackColor="White"/>
+        <SolidColorBrush x:Key="Foreground_Error_Brush" Color="Red"/>
+        <SolidColorBrush x:Key="Background_Welcome_Brush" Color="#311B92"/>
+        <SolidColorBrush x:Key="Foreground_Welcome_Brush" Color="White"/>
+    </Page.Resources>
+    <Grid x:Name="MainGrid">
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                <VisualState x:Name="Grid_LargeState">
+                    <Storyboard/>
+                </VisualState>
+                <VisualState x:Name="Grid_MediumState">
+                    <Storyboard/>
+                </VisualState>
+                <VisualState x:Name="Grid_SmallState">
+                    <VisualState.Setters>
+                        <Setter Target="MainGrid.ColumnDefinitions[0].Width" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="2*"/>
+            <ColumnDefinition Width="1*"/>
+        </Grid.ColumnDefinitions>
+        <UserControl x:Name="UC_TextControl">
+            <Grid Background="{StaticResource Background_Welcome_Brush}" Padding="120,120,120,0">
+                <VisualStateManager.VisualStateGroups>
+                    <VisualStateGroup>
+                        <VisualState x:Name="Text_LargeState">
+                            <Storyboard/>
+                        </VisualState>
+                        <VisualState x:Name="Text_MediumState">
+                            <VisualState.Setters>
+                                <Setter Target="TB_Title.FontSize" Value="25"/>
+                                <Setter Target="TB_Bienvenida.FontSize" Value="20"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Text_SmallState">
+                            <VisualState.Setters>
+                                <Setter Target="TB_Title.Text" Value="SmallState"/>
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateManager.VisualStateGroups>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="auto"/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock
+                    x:Name="TB_Title"
+                    Text="Bienvenido a JevoGastos" 
+                    Style="{StaticResource HeaderTextBlockStyle}"
+                    HorizontalAlignment="Center"
+                    Margin="12"
+                    Foreground="{StaticResource Foreground_Welcome_Brush}" FontWeight="Bold"/>
+                <TextBlock x:Name="TB_Bienvenida" 
+                    Text="Para comenzar puede iniciar sesión con una cuenta ya existente o crear una nueva, si actualizaste desde una versión anterior, puedes crear un nuevo usuario y ponerle de nombre (db)."
+                       TextWrapping="WrapWholeWords" 
+                       Style="{StaticResource TitleTextBlockStyle}" 
+                       Grid.Row="1"
+                       Foreground="{StaticResource Foreground_Welcome_Brush}"/>
+            </Grid>
+        </UserControl>
+        <RelativePanel x:Name="RP_UserPanel" Grid.Column="1" Background="{StaticResource Background_Brush}">
+            <Grid 
+                x:Name="Grid"
+                RelativePanel.AlignHorizontalCenterWithPanel="True"
+                RelativePanel.AlignVerticalCenterWithPanel="True"
+                Padding="24,24,24,24"
+                CornerRadius="8,8,8,8"
+                Background="{StaticResource Background_SignForm_Brush}"
+                ColumnSpacing="24">
+                <!--#region Configuracion-->
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1*"/>
+                    <ColumnDefinition Width="1*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <!--#endregion-->
+                <!--#region Content-->
+                <ComboBox
+                x:Name="CB_Username"
+                ItemsSource="{x:Bind Users}"
+                ItemTemplate="{StaticResource User_Template}"
+                Header="Usuario"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Stretch"
+                SelectionChanged="CB_Username_SelectionChanged"
+                />
+                <PasswordBox 
+                    x:Name="PB_Password"
+                    Header="Contraseña"
+                    Grid.Row="1" 
+                    Grid.ColumnSpan="2"/>
+                <CheckBox 
+                    x:Name="CB_KeepSignIn"
+                    Content="Mantener sesión iniciada"
+                    Grid.Row="2" 
+                    Grid.ColumnSpan="2"/>
+                <Button x:Name="B_SignIn"
+                    Grid.Row="3"
+                    HorizontalAlignment="Stretch"
+                    Content="Iniciar sesión"
+                    Click="SignIn_Click"
+                    Background="ForestGreen"
+                    Foreground="White">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="Enter" ScopeOwner="{x:Bind Grid}"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+                <Button
+                    x:Name="B_AddUser"
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    HorizontalAlignment="Stretch"
+                    Content="Nuevo usuario"
+                    Click="AddUser_Clic">
+                    <Button.Flyout>
+                        <Flyout 
+                        FlyoutPresenterStyle="{StaticResource FlyoutFlyoutPresenterStyleNoPadding}"
+                        LightDismissOverlayMode="On">
+                            <Frame x:Name="Frame_AddUser"/>
+                        </Flyout>
+                    </Button.Flyout>
+                </Button>
+                <!--#endregion-->
+            </Grid>
+            <Border
+                Padding="24,0,24,24"
+                CornerRadius="0,0,8,8"
+                Background="{StaticResource Background_SignForm_Brush}"
+                RelativePanel.Below="Grid"
+                RelativePanel.AlignLeftWith="Grid"
+                RelativePanel.AlignRightWith="Grid"
+                Visibility="{x:Bind IncorrectSignIn.Value,Mode=OneWay}">
+                <TextBlock 
+                x:Name="ErrorMessage"
+                Text="Usuario o contraseña incorrectos."
+                Foreground="{StaticResource Foreground_Error_Brush}"
+                Grid.Row="4"
+                Grid.ColumnSpan="2"
+                HorizontalAlignment="Center"
+            />
+            </Border>
+        </RelativePanel>
+    </Grid>
+</Page>
