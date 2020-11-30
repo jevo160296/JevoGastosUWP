@@ -405,8 +405,6 @@ namespace JevoGastosUWP.Forms
                 parameters);
             ((EtiquetaForm)Frame_EtiquetaForm.Content).CloseRequested += TransForm_CloseRequested;
         }
-        #endregion
-
         private void AddTransaccion(Etiqueta Origen, Etiqueta Destino, double valor, string descripcion = null, DateTime? dateTime = null)
         {
             if (!(Origen is null) & !(Destino is null))
@@ -446,7 +444,7 @@ namespace JevoGastosUWP.Forms
         {
             lastpressed = e.Key;
         }
-        private void Page_LostFocus(object sender, RoutedEventArgs e)
+        public void NotifyPageClosed()
         {
             if (!EditandoTrans)
             {
@@ -454,5 +452,8 @@ namespace JevoGastosUWP.Forms
                 CB_Tipo.SelectedIndex = -1;
             }
         }
+        #endregion
+
+
     }
 }

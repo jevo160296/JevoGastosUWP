@@ -559,8 +559,9 @@ namespace JevoGastosUWP
             menuFlyout.Items.Add(editar);
             args.ItemContainer.ContextFlyout = menuFlyout;
         }
-        private void AddTransFlyout_Closing(Windows.UI.Xaml.Controls.Primitives.FlyoutBase sender, Windows.UI.Xaml.Controls.Primitives.FlyoutBaseClosingEventArgs args)
+        private void AddTransFlyout_Closing(FlyoutBase sender,FlyoutBaseClosingEventArgs args)
         {
+            ((TransForm)((Frame)(((Flyout)sender).Content))?.Content)?.NotifyPageClosed();
         }
         private void ShowIngresoForm()
         {
