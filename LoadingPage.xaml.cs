@@ -114,7 +114,7 @@ namespace JevoGastosUWP
         private GastosContainer LoadContainer()
         {
             GastosContainer gastosContainer =
-                new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path, this.User, this.parameters.UsersContainer, false, User.UserName + ".db");
+                new GastosContainer(Windows.Storage.ApplicationData.Current.LocalFolder.Path, this.User, this.parameters.UsersContainer, false);
 
             return gastosContainer;
         }
