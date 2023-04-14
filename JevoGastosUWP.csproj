@@ -11,14 +11,14 @@
     <AssemblyName>JevoGastosUWP</AssemblyName>
     <DefaultLanguage>es-ES</DefaultLanguage>
     <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformVersion Condition=" '$(TargetPlatformVersion)' == '' ">10.0.22621.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.18362.0</TargetPlatformMinVersion>
     <MinimumVisualStudioVersion>14</MinimumVisualStudioVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{A5A43C5B-DE2A-4C0C-9213-0A381AF9435A};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WindowsXamlEnableOverview>true</WindowsXamlEnableOverview>
     <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
-    <PackageCertificateThumbprint>2468E55A17AB2622DDA153CE2B661EB858E997BE</PackageCertificateThumbprint>
+    <PackageCertificateThumbprint>8A2AB07165B8157B392A11F68699F51D20C8EC92</PackageCertificateThumbprint>
     <PackageCertificateKeyFile />
     <GenerateAppInstallerFile>False</GenerateAppInstallerFile>
     <AppxPackageSigningTimestampDigestAlgorithm>SHA256</AppxPackageSigningTimestampDigestAlgorithm>
@@ -304,11 +304,11 @@
     <PRIResource Include="Strings\en-US\Resources.resw" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\EntityCoreBasics\EntityCoreBasics.csproj">
+    <ProjectReference Include="..\EntityCoreBasics\EntityCoreBasics.csproj">
       <Project>{9eb770ed-e8f0-46d9-bb89-d5954bd7e171}</Project>
       <Name>EntityCoreBasics</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\JevoCrypt\JevoCrypt.csproj">
+    <ProjectReference Include="..\JevoCrypt\JevoCrypt.csproj">
       <Project>{3c41611c-17e9-454f-a226-f7dfa60c518a}</Project>
       <Name>JevoCrypt</Name>
     </ProjectReference>
@@ -322,6 +322,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="JevoGastosUWP_TemporaryKey.pfx" />
+    <None Include="JevoKey.pfx" />
     <None Include="JevoMiguel.pfx" />
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
@@ -331,7 +332,10 @@
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>JevoMiguel.pfx</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>JevoGastosUWP_TemporaryKey.pfx</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <PropertyGroup>
+    <DelaySign>false</DelaySign>
   </PropertyGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\WindowsXaml\v$(VisualStudioVersion)\Microsoft.Windows.UI.Xaml.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
